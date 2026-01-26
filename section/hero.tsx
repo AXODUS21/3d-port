@@ -67,7 +67,7 @@ const SceneContent = ({ scrollContainer }: { scrollContainer: React.RefObject<HT
         if (sceneRef.current) {
              // Move Scene Left
             tl.to(sceneRef.current.position, {
-                x: -3.5,
+                x: -1.0,
                 duration: 0.8,
                 ease: "power2.inOut",
             }, "+=0.2")
