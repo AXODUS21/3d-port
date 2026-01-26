@@ -37,8 +37,8 @@ const SceneContent = ({ scrollContainer }: { scrollContainer: React.RefObject<HT
 
         // Phase 1: Animate Camera to top-down view
         tl.to(camera.position, {
-            x: -0.00,
-            y: 5,
+            x: 0,
+            y: 3.73,
             z: 0.01,
             duration: 1,
             ease: "power2.out",
@@ -54,9 +54,9 @@ const SceneContent = ({ scrollContainer }: { scrollContainer: React.RefObject<HT
             modelRef.current.scale.set(1, 1, 1)
             
             tl.to(modelRef.current.rotation, {
-                x: -Math.PI / 2,
+                x: 0, // Rotated opposite direction to face camera
                 y: 0,
-                z: 0,
+                z: 0, // Adjust if text is upside down
                 duration: 1,
                 ease: "power2.out"
             }, 0)
