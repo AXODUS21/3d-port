@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Environment, Center } from '@react-three/drei'
 import { LivingFluidBackground } from '@/components/living-fluid-background'
+import { Navigation } from '@/components/navigation'
 import { Model as XelltextModel } from '@/components/Xelltext'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -11,7 +12,13 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SceneContent = ({ scrollContainer, textRef, fluidBgRef }: { scrollContainer: React.RefObject<HTMLDivElement | null>, textRef: React.RefObject<HTMLDivElement | null>, fluidBgRef: React.RefObject<HTMLDivElement | null> }) => {
+const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef }: { 
+    scrollContainer: React.RefObject<HTMLDivElement | null>, 
+    textRef: React.RefObject<HTMLDivElement | null>, 
+    fluidBgRef: React.RefObject<HTMLDivElement | null>,
+    navTopRef: React.RefObject<HTMLDivElement | null>,
+    navBottomRef: React.RefObject<HTMLDivElement | null>
+}) => {
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Group>(null)
@@ -135,6 +142,27 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef }: { scrollContaine
             }, "<")
         }
 
+        // -------------------------------------------------------------
+        // Animate Navigation OUT (Slide out when text appears)
+        // -------------------------------------------------------------
+        if (navTopRef.current) {
+            tl.to(navTopRef.current, {
+                y: -150,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.inOut"
+            }, "<")
+        }
+
+        if (navBottomRef.current) {
+            tl.to(navBottomRef.current, {
+                y: 150,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.inOut"
+            }, "<")
+        }
+
         // Add a buffer at the end
         tl.to({}, { duration: 0.5 })
 
@@ -179,13 +207,22 @@ const Hero = (props: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
   const fluidBgRef = useRef<HTMLDivElement>(null)
+  const navTopRef = useRef<HTMLDivElement>(null)
+  const navBottomRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative w-full">
         <div ref={containerRef} id="hero-container" className="relative h-screen w-full" style={{ backgroundColor: '#18181b' }}>
+            <Navigation topRef={navTopRef} bottomRef={navBottomRef} />
             <Canvas className="pointer-events-none z-0 relative" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
-                    <SceneContent scrollContainer={containerRef} textRef={textRef} fluidBgRef={fluidBgRef} />
+                    <SceneContent 
+                        scrollContainer={containerRef} 
+                        textRef={textRef} 
+                        fluidBgRef={fluidBgRef}
+                        navTopRef={navTopRef}
+                        navBottomRef={navBottomRef}
+                    />
                 </Suspense>
             </Canvas>
             <LivingFluidBackground ref={fluidBgRef} className="z-10" />
