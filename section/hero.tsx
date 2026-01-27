@@ -10,7 +10,7 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SceneContent = ({ scrollContainer }: { scrollContainer: React.RefObject<HTMLDivElement | null> }) => {
+const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.RefObject<HTMLDivElement | null>, textRef: React.RefObject<HTMLDivElement | null> }) => {
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Group>(null)
@@ -74,11 +74,23 @@ const SceneContent = ({ scrollContainer }: { scrollContainer: React.RefObject<HT
         }
 
         if (modelRef.current) {
-             // Scale Model Down
             tl.to(modelRef.current.scale, {
                 x: 0.4,
                 y: 0.4,
                 z: 0.4,
+                duration: 0.8,
+                ease: "power2.inOut"
+            }, "<")
+        }
+
+        // Animate Text Side-by-Side
+        if (textRef.current) {
+            tl.fromTo(textRef.current, {
+                opacity: 0,
+                x: 100,
+            }, {
+                opacity: 1,
+                x: 0,
                 duration: 0.8,
                 ease: "power2.inOut"
             }, "<")
@@ -115,15 +127,24 @@ type Props = {}
 
 const Hero = (props: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative w-full">
-        <div ref={containerRef} className="h-screen w-full bg-slate-900">
+        <div ref={containerRef} className="relative h-screen w-full bg-slate-900">
             <Canvas className="pointer-events-none" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
-                    <SceneContent scrollContainer={containerRef} />
+                    <SceneContent scrollContainer={containerRef} textRef={textRef} />
                 </Suspense>
             </Canvas>
+            <div 
+                ref={textRef}
+                className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none"
+            >
+                <div className="text-white text-4xl font-bold">
+                    hi
+                </div>
+            </div>
         </div>
     </div>
   )
