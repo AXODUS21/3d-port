@@ -74,6 +74,7 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
            modelRef.current.traverse((child) => {
                 if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
                      const material = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
+                     
                      tl.to(material.color, {
                          r: 0, 
                          g: 0, 
@@ -182,7 +183,7 @@ const Hero = (props: Props) => {
 
   return (
     <div className="relative w-full">
-        <div ref={containerRef} id="hero-container" className="relative h-screen w-full bg-slate-900">
+        <div ref={containerRef} id="hero-container" className="relative h-screen w-full bg-black">
             <Canvas className="pointer-events-none" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
                     <SceneContent scrollContainer={containerRef} textRef={textRef} />
