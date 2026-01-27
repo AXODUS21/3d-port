@@ -1,4 +1,9 @@
 import Hero from "@/section/hero";
+import FeaturedProjects from "@/section/featured-projects";
+import Testimonials from "@/section/testimonials";
+import Skills from "@/section/skills";
+import Services from "@/section/services";
+import Contact from "@/section/contact";
 import Image from "next/image";
 
 export default function Home() {
@@ -6,9 +11,11 @@ export default function Home() {
     <div className="">
       <main>
         <Hero/>
-        <section className="min-h-screen bg-slate-800 flex items-center justify-center text-white">
-          <h2 className="text-4xl font-bold">More Content Here</h2>
-        </section>
+        <FeaturedProjects />
+        <Testimonials />
+        <Skills />
+        <Services />
+        <Contact />
       </main>
     </div>
   );

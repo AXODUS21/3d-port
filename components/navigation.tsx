@@ -14,20 +14,33 @@ export const Navigation = ({ topRef, bottomRef }: { topRef: React.RefObject<HTML
     <>
       {/* Top Right CTA */}
       <div ref={topRef} className="fixed top-8 right-8 z-[100]">
-        <button className="px-6 py-2 rounded-full border border-zinc-800 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-all duration-300 shadow-md">
+        <button 
+          onClick={() => {
+            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="px-6 py-2 rounded-full border border-zinc-800 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-all duration-300 shadow-md cursor-pointer pointer-events-auto"
+        >
           Contact
         </button>
       </div>
 
       {/* Bottom Center Nav */}
       <div ref={bottomRef} className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
-        <nav className="flex items-center gap-2 px-2 py-2 rounded-full border border-zinc-800 bg-zinc-900 shadow-lg">
-           {['Work', 'About', 'Stack', 'Notes'].map((item) => (
+        <nav className="flex items-center gap-2 px-2 py-2 rounded-full border border-zinc-800 bg-zinc-900 shadow-lg pointer-events-auto">
+           {[
+             { name: 'Projects', id: 'work' },
+             { name: 'Testimonials', id: 'testimonials' },
+             { name: 'Skills', id: 'skills' },
+             { name: 'Services', id: 'services' }
+           ].map((item) => (
              <button 
-               key={item}
-               className="px-5 py-2 rounded-full text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-300"
+               key={item.name}
+               onClick={() => {
+                 document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
+               }}
+               className="px-5 py-2 rounded-full text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-300 cursor-pointer"
              >
-               {item}
+               {item.name}
              </button>
            ))}
         </nav>
