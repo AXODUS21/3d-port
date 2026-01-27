@@ -100,9 +100,9 @@ export const LivingFluidBackground = forwardRef<HTMLDivElement, { className?: st
                 vec3 color = vec3(1.0, 1.0, 1.0);
 
                 // Alpha:
-                // Increase the start threshold significantly (0.6) so only the VERY peaks are visible.
-                // This will make most of the screen transparent.
-                float visibility = smoothstep(0.6, 0.8, final_noise); 
+                // Reduce particle density by raising the threshold further (0.6 -> 0.75)
+                // This makes the static much sparser.
+                float visibility = smoothstep(0.75, 0.9, final_noise); 
                 
                 // Boost alpha for visible parts
                 float alpha = visibility * 0.5; 
