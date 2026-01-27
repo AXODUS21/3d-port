@@ -47,6 +47,15 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
             }
         }, 0)
 
+        // Animate Background from dark (initial) to white (Phase 1)
+        if (scrollContainer.current) {
+            tl.to(scrollContainer.current, {
+                backgroundColor: '#ffffff',
+                duration: 0.5,
+                ease: "power2.out"
+            }, 0)
+        }
+
         // Phase 2: Animate Model Rotation
         // We can do this safely because refs adhere to the same component lifecycle here
         if (modelRef.current) {
@@ -60,6 +69,20 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
                 duration: 1,
                 ease: "power2.out"
             }, 0)
+
+            // Animate Material Color to Black (Theme Switch)
+           modelRef.current.traverse((child) => {
+                if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
+                     const material = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
+                     tl.to(material.color, {
+                         r: 0, 
+                         g: 0, 
+                         b: 0,
+                         duration: 0.5,
+                         ease: "power2.out"
+                     }, 0)
+                }
+            })
 
             // Slight Tilt Adjustment
             tl.to(modelRef.current.rotation, {
@@ -159,7 +182,7 @@ const Hero = (props: Props) => {
 
   return (
     <div className="relative w-full">
-        <div ref={containerRef} className="relative h-screen w-full bg-white">
+        <div ref={containerRef} id="hero-container" className="relative h-screen w-full bg-slate-900">
             <Canvas className="pointer-events-none" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
                     <SceneContent scrollContainer={containerRef} textRef={textRef} />
