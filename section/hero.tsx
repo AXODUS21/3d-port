@@ -92,9 +92,9 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
 
         if (modelRef.current) {
             tl.to(modelRef.current.scale, {
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
+                x: 0.6,
+                y: 0.6,
+                z: 0.6,
                 duration: 0.8,
                 ease: "power2.inOut"
             }, "<")
@@ -137,8 +137,8 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
 
   return (
     <>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
+        <ambientLight intensity={2} />
+        <directionalLight position={[5, 10, 7]} intensity={3} />
         <group ref={sceneRef}>
             <Center>
                 <group ref={modelRef}>
@@ -159,7 +159,7 @@ const Hero = (props: Props) => {
 
   return (
     <div className="relative w-full">
-        <div ref={containerRef} className="relative h-screen w-full bg-slate-900">
+        <div ref={containerRef} className="relative h-screen w-full bg-white">
             <Canvas className="pointer-events-none" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
                     <SceneContent scrollContainer={containerRef} textRef={textRef} />
@@ -169,8 +169,9 @@ const Hero = (props: Props) => {
                 ref={textRef}
                 className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none"
             >
-                <div className="text-white text-4xl font-bold">
-                    hi
+                <div className="text-black text-2xl font-bold p-10">
+                    I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.<br></br><br></br>
+                    My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
                 </div>
             </div>
         </div>

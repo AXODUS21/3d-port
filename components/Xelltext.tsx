@@ -21,6 +21,7 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
         receiveShadow
         geometry={nodes.Text002.geometry}
         material={materials['Material.021']}
+        material-color="black"
         position={[2.785, 0, 0.883]}
         scale={1.999}
       />
