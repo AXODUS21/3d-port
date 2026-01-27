@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Environment, Center } from '@react-three/drei'
+import { LivingFluidBackground } from '@/components/living-fluid-background'
 import { Model as XelltextModel } from '@/components/Xelltext'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -10,7 +11,7 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.RefObject<HTMLDivElement | null>, textRef: React.RefObject<HTMLDivElement | null> }) => {
+const SceneContent = ({ scrollContainer, textRef, fluidBgRef }: { scrollContainer: React.RefObject<HTMLDivElement | null>, textRef: React.RefObject<HTMLDivElement | null>, fluidBgRef: React.RefObject<HTMLDivElement | null> }) => {
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Group>(null)
@@ -56,6 +57,15 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
             }, 0)
         }
 
+        // Fade out Fluid Background
+        if (fluidBgRef.current) {
+            tl.to(fluidBgRef.current, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.out"
+            }, 0)
+        }
+
         // Phase 2: Animate Model Rotation
         // We can do this safely because refs adhere to the same component lifecycle here
         if (modelRef.current) {
@@ -71,19 +81,7 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
             }, 0)
 
             // Animate Material Color to Black (Theme Switch)
-           modelRef.current.traverse((child) => {
-                if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).material) {
-                     const material = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
-                     
-                     tl.to(material.color, {
-                         r: 0, 
-                         g: 0, 
-                         b: 0,
-                         duration: 0.5,
-                         ease: "power2.out"
-                     }, 0)
-                }
-            })
+
 
             // Slight Tilt Adjustment
             tl.to(modelRef.current.rotation, {
@@ -180,20 +178,22 @@ type Props = {}
 const Hero = (props: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
+  const fluidBgRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative w-full">
-        <div ref={containerRef} id="hero-container" className="relative h-screen w-full bg-black">
-            <Canvas className="pointer-events-none" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
+        <div ref={containerRef} id="hero-container" className="relative h-screen w-full" style={{ backgroundColor: '#18181b' }}>
+            <Canvas className="pointer-events-none z-0 relative" camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}>
                 <Suspense fallback={null}>
-                    <SceneContent scrollContainer={containerRef} textRef={textRef} />
+                    <SceneContent scrollContainer={containerRef} textRef={textRef} fluidBgRef={fluidBgRef} />
                 </Suspense>
             </Canvas>
+            <LivingFluidBackground ref={fluidBgRef} className="z-10" />
             <div 
                 ref={textRef}
-                className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none"
+                className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none z-20"
             >
-                <div className="text-black text-2xl font-bold p-10">
+                <div className="text-zinc-800 text-2xl font-bold p-10">
                     I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.<br></br><br></br>
                     My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
                 </div>
