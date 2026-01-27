@@ -89,9 +89,9 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
 
             // Slight Tilt Adjustment
             tl.to(modelRef.current.rotation, {
-                x: 0.2,
-                y: 0.2,
-                z: 0.5,
+                x: -0.2,
+                y: -0.2,
+                z: -0.4,
                 duration: 1,
                 ease: "power2.inOut"
             }, ">")
@@ -110,7 +110,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         if (sceneRef.current) {
              // Move Scene Left
             tl.to(sceneRef.current.position, {
-                x: -0.8,
+                x: -0.6,
                 duration: 0.8,
                 ease: "power2.inOut",
             }, "+=0.2")
