@@ -1,7 +1,7 @@
 'use client'
 
 import React, { Suspense, useEffect, useRef } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Environment, Center } from '@react-three/drei'
 import { Model as XelltextModel } from '@/components/Xelltext'
 import gsap from 'gsap'
@@ -60,6 +60,23 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
                 duration: 1,
                 ease: "power2.out"
             }, 0)
+
+            // Slight Tilt Adjustment
+            tl.to(modelRef.current.rotation, {
+                x: 0.2,
+                y: 0.2,
+                z: -0.1,
+                duration: 1,
+                ease: "power2.inOut"
+            }, ">")
+
+            if (sceneRef.current) {
+                tl.to(sceneRef.current.position, {
+                    z: 0.5,
+                    duration: 1,
+                    ease: "power2.inOut"
+                }, "<")
+            }
         }
         
         // Phase 3: Move Scene Left (Reliable)
@@ -67,7 +84,7 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
         if (sceneRef.current) {
              // Move Scene Left
             tl.to(sceneRef.current.position, {
-                x: -1.0,
+                x: -0.8,
                 duration: 0.8,
                 ease: "power2.inOut",
             }, "+=0.2")
@@ -75,9 +92,9 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
 
         if (modelRef.current) {
             tl.to(modelRef.current.scale, {
-                x: 0.4,
-                y: 0.4,
-                z: 0.4,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
                 duration: 0.8,
                 ease: "power2.inOut"
             }, "<")
@@ -106,6 +123,17 @@ const SceneContent = ({ scrollContainer, textRef }: { scrollContainer: React.Ref
 
     return () => ctx.revert()
   }, [camera, scrollContainer])
+
+  useFrame((state) => {
+    if (sceneRef.current) {
+        // Simple subtle mouse influence
+        const targetY = state.mouse.x * 0.02
+        const targetX = -state.mouse.y * 0.01
+
+        sceneRef.current.rotation.y += (targetY - sceneRef.current.rotation.y) * 0.1
+        sceneRef.current.rotation.x += (targetX - sceneRef.current.rotation.x) * 0.1
+    }
+  })
 
   return (
     <>
