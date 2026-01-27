@@ -5,10 +5,10 @@ import { GLTF } from 'three-stdlib'
 
 type GLTFResult = GLTF & {
   nodes: {
-    Text002: THREE.Mesh
+    Text003: THREE.Mesh
   }
   materials: {
-    ['Material.021']: THREE.MeshStandardMaterial
+    ['Material.022']: THREE.MeshStandardMaterial
   }
 }
 
@@ -19,11 +19,10 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.Text002.geometry}
-        material={materials['Material.021']}
-        material-color="#262626"
-        position={[2.785, 0, 0.883]}
-        scale={1.999}
+        geometry={nodes.Text003.geometry}
+        material={materials['Material.022']}
+        position={[2.658, -0.005, 2.569]}
+        scale={2.03}
       />
     </group>
   )

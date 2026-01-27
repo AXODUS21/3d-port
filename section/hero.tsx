@@ -27,7 +27,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
     if (!scrollContainer.current) return
 
     // Set initial position
-    camera.position.set(-2.23, 0.00, -0.14)
+    camera.position.set(-1.95, 0.00, -0.1)
     camera.lookAt(0, 0, 0)
 
     let ctx = gsap.context(() => {
@@ -80,21 +80,18 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             modelRef.current.scale.set(1, 1, 1)
             
             tl.to(modelRef.current.rotation, {
-                x: 0, // Rotated opposite direction to face camera
+                x: 0, 
                 y: 0,
-                z: 0, // Adjust if text is upside down
+                z: 0, 
                 duration: 1,
                 ease: "power2.out"
             }, 0)
-
-            // Animate Material Color to Black (Theme Switch)
-
 
             // Slight Tilt Adjustment
             tl.to(modelRef.current.rotation, {
                 x: 0.2,
                 y: 0.2,
-                z: -0.1,
+                z: 0.5,
                 duration: 1,
                 ease: "power2.inOut"
             }, ">")
@@ -227,6 +224,7 @@ const Hero = (props: Props) => {
                 className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none z-20"
             >
                 <div className="text-zinc-800 text-2xl font-bold p-10">
+                <h2 className="text-4xl font-bold mb-8">About Me</h2>
                     I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.<br></br><br></br>
                     My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
                 </div>
