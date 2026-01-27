@@ -145,6 +145,9 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         // -------------------------------------------------------------
         // Animate Navigation OUT (Slide out when text appears)
         // -------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Animate Top Navigation OUT (Contact button)
+        // -------------------------------------------------------------
         if (navTopRef.current) {
             tl.to(navTopRef.current, {
                 y: -150,
@@ -154,14 +157,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             }, "<")
         }
 
-        if (navBottomRef.current) {
-            tl.to(navBottomRef.current, {
-                y: 150,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.inOut"
-            }, "<")
-        }
+        // Bottom Navigation stays visible
 
         // Add a buffer at the end
         tl.to({}, { duration: 0.5 })
