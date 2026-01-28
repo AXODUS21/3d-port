@@ -14,20 +14,21 @@ export const Navigation = ({ topRef, bottomRef }: { topRef: React.RefObject<HTML
     <>
       {/* Top Right CTA */}
       {/* Top Right CTA */}
+      {/* Top Right CTA */}
       <div ref={topRef} className="fixed top-8 right-8 z-[100]">
         <button 
           onClick={() => {
             document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="px-6 py-2 rounded-sm border border-zinc-800 bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-all duration-300 shadow-md cursor-pointer pointer-events-auto"
+          className="group px-6 py-2 rounded-none border-[0.5px] border-white bg-zinc-950 text-white font-mono text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-300 cursor-pointer pointer-events-auto overflow-hidden relative"
         >
-          Contact
+          <span className="relative z-10">Contact</span>
         </button>
       </div>
 
       {/* Bottom Center Nav */}
       <div ref={bottomRef} className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
-        <nav className="flex items-center gap-2 px-2 py-2 rounded-sm border border-zinc-800 bg-zinc-900 shadow-lg pointer-events-auto">
+        <nav className="flex items-center gap-1 p-1 bg-zinc-950 pointer-events-auto">
            {[
              { name: 'Projects', id: 'work' },
              { name: 'Testimonials', id: 'testimonials' },
@@ -39,7 +40,7 @@ export const Navigation = ({ topRef, bottomRef }: { topRef: React.RefObject<HTML
                onClick={() => {
                  document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
                }}
-               className="px-5 py-2 rounded-sm text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all duration-300 cursor-pointer"
+               className="px-6 py-2 bg-transparent font-mono text-xs uppercase tracking-wider text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer border-[0.5px] border-white ring-0 outline-none"
              >
                {item.name}
              </button>

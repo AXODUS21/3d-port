@@ -242,19 +242,23 @@ const Hero = (props: Props) => {
                 ref={introWordsRef}
                 className="absolute inset-0 flex items-center justify-between w-full pointer-events-none z-30 mix-blend-difference"
             >
-                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase">Materializing</span>
-                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase -translate-x-[45px]">the</span>
-                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase">Experience</span>
+                <span className="text-white text-[10px] font-mono tracking-widest uppercase">Materializing</span>
+                <span className="text-white text-[10px] font-mono tracking-widest uppercase -translate-x-[45px]">the</span>
+                <span className="text-white text-[10px] font-mono tracking-widest uppercase">Experience</span>
             </div>
 
             <div 
                 ref={textRef}
                 className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none z-20"
             >
-                <div className="text-zinc-800 text-2xl font-bold p-10">
-                <h2 className="text-4xl font-bold mb-8">About Me</h2>
-                    I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.<br></br><br></br>
-                    My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
+                <div className="text-zinc-800 text-2xl p-10 max-w-2xl">
+                <h2 className="text-6xl font-bold tracking-tighter mb-8 text-black">About Me</h2>
+                    <p className="font-light leading-relaxed text-zinc-800 mb-6">
+                        I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.
+                    </p>
+                    <p className="font-light leading-relaxed text-zinc-800">
+                        My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
+                    </p>
                 </div>
             </div>
         </div>
