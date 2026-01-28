@@ -12,12 +12,13 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef }: { 
+const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef, introWordsRef }: { 
     scrollContainer: React.RefObject<HTMLDivElement | null>, 
     textRef: React.RefObject<HTMLDivElement | null>, 
     fluidBgRef: React.RefObject<HTMLDivElement | null>,
     navTopRef: React.RefObject<HTMLDivElement | null>,
-    navBottomRef: React.RefObject<HTMLDivElement | null>
+    navBottomRef: React.RefObject<HTMLDivElement | null>,
+    introWordsRef: React.RefObject<HTMLDivElement | null>
 }) => {
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
@@ -73,6 +74,16 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             }, 0)
         }
 
+        // Animate Intro Words AWAY (Phase 1)
+        if (introWordsRef.current) {
+            tl.to(introWordsRef.current, {
+                opacity: 0,
+                y: -50,
+                duration: 0.8,
+                ease: "power2.out"
+            }, 0)
+        }
+
         // Phase 2: Animate Model Rotation
         // We can do this safely because refs adhere to the same component lifecycle here
         if (modelRef.current) {
@@ -111,6 +122,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
              // Move Scene Left
             tl.to(sceneRef.current.position, {
                 x: -0.6,
+                y: -0.3,
                 duration: 0.8,
                 ease: "power2.inOut",
             }, "+=0.2")
@@ -202,6 +214,7 @@ const Hero = (props: Props) => {
   const fluidBgRef = useRef<HTMLDivElement>(null)
   const navTopRef = useRef<HTMLDivElement>(null)
   const navBottomRef = useRef<HTMLDivElement>(null)
+  const introWordsRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative w-full">
@@ -215,10 +228,22 @@ const Hero = (props: Props) => {
                         fluidBgRef={fluidBgRef}
                         navTopRef={navTopRef}
                         navBottomRef={navBottomRef}
+                        introWordsRef={introWordsRef}
                     />
                 </Suspense>
             </Canvas>
             <LivingFluidBackground ref={fluidBgRef} className="z-10" />
+
+            {/* Intro Words */}
+            <div 
+                ref={introWordsRef}
+                className="absolute inset-0 flex items-center justify-between w-full pointer-events-none z-30 mix-blend-difference"
+            >
+                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase">Materializing</span>
+                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase -translate-x-[45px]">the</span>
+                <span className="text-white text-[10px] font-medium tracking-[0.2em] uppercase">Experience</span>
+            </div>
+
             <div 
                 ref={textRef}
                 className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none z-20"
