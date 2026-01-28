@@ -84,6 +84,16 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             }, 0)
         }
 
+        // Animate Top Navigation OUT (Contact button) - Phase 1
+        if (navTopRef.current) {
+            tl.to(navTopRef.current, {
+                y: -150,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            }, 0)
+        }
+
         // Phase 2: Animate Model Rotation
         // We can do this safely because refs adhere to the same component lifecycle here
         if (modelRef.current) {
@@ -157,14 +167,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         // -------------------------------------------------------------
         // Animate Top Navigation OUT (Contact button)
         // -------------------------------------------------------------
-        if (navTopRef.current) {
-            tl.to(navTopRef.current, {
-                y: -150,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.inOut"
-            }, "<")
-        }
+
 
         // Bottom Navigation stays visible
 
