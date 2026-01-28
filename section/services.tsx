@@ -42,9 +42,8 @@ const Services = () => {
                 <div key={index} className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
                     
                     {/* Blurred Background Layer */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 animate-in fade-in duration-700`} />
-                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r ${service.color} rounded-full blur-[120px] opacity-40`} />
-                    <div className="absolute inset-0 backdrop-blur-[100px]" />
+                    {/* Flat Background Layer */}
+                    <div className="absolute inset-0 bg-zinc-950 block" />
 
                     {/* Card */}
                     <div className="relative z-10 max-w-2xl w-full mx-6 p-12 bg-zinc-950/40 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden group hover:border-white/20 transition-colors">
