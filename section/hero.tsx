@@ -184,12 +184,16 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
 
   useFrame((state) => {
     if (sceneRef.current) {
-        // Simple subtle mouse influence
-        const targetY = state.mouse.x * 0.02
-        const targetX = -state.mouse.y * 0.1   
-
-        sceneRef.current.rotation.y += (targetY - sceneRef.current.rotation.y) * 0.1
-        sceneRef.current.rotation.x += (targetX - sceneRef.current.rotation.x) * 0.1
+        // Only allow mouse interaction if we are roughly in the hero section view
+        // 1.5 viewport height buffer to ensure it feels responsive during the initial scroll
+        if (window.scrollY < window.innerHeight * 1.5) {
+            // Simple subtle mouse influence
+            const targetY = state.mouse.x * 0.02
+            const targetX = -state.mouse.y * 0.1   
+    
+            sceneRef.current.rotation.y += (targetY - sceneRef.current.rotation.y) * 0.1
+            sceneRef.current.rotation.x += (targetX - sceneRef.current.rotation.x) * 0.1
+        }
     }
   })
 
