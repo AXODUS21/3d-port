@@ -1,38 +1,56 @@
-import React from 'react'
-
 const Contact = () => {
   return (
-    <section id="contact" className="min-h-[80vh] py-20 px-8 flex flex-col items-center justify-center bg-zinc-950 text-white relative">
-      <div className="max-w-2xl w-full text-center">
-        <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight bg-linear-to-b from-white to-zinc-500 bg-clip-text text-transparent">
-          Let's Talk
-        </h2>
-        <p className="text-xl text-zinc-400 mb-12">
-          Have a project in mind? detailed proposal? or just want to say hi?
-        </p>
-        
-        <form className="flex flex-col gap-4 text-left">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input 
-              type="text" 
-              placeholder="Name" 
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-white focus:outline-none focus:border-zinc-600 transition-colors"
-            />
-            <input 
-              type="email" 
-              placeholder="Email" 
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-white focus:outline-none focus:border-zinc-600 transition-colors"
-            />
+    <section id="contact" className="min-h-screen py-32 px-8 flex flex-col items-center justify-center bg-zinc-950 text-white relative border-t border-zinc-900">
+      
+      <div className="max-w-4xl w-full">
+         <div className="flex items-end justify-between mb-16">
+            <h2 className="text-6xl md:text-9xl font-bold tracking-tighter text-zinc-100">
+              GET IN<br/>TOUCH
+            </h2>
+            <div className="hidden md:block text-right">
+                <p className="text-zinc-500 font-mono text-sm uppercase tracking-widest mb-2">
+                    [ START_COMMUNICATION ]
+                </p>
+                <p className="text-zinc-400 text-lg">
+                    hello@axellerosh.dev
+                </p>
+            </div>
+         </div>
+
+        <form className="flex flex-col gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="group relative">
+                <input 
+                  type="text" 
+                  required
+                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700"
+                  placeholder="NAME"
+                />
+            </div>
+            <div className="group relative">
+                <input 
+                  type="email" 
+                  required
+                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700"
+                  placeholder="EMAIL"
+                />
+            </div>
           </div>
-          <textarea 
-            placeholder="Message" 
-            rows={5}
-            className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-white focus:outline-none focus:border-zinc-600 transition-colors resize-none"
-          ></textarea>
           
-          <button className="mt-4 px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-zinc-200 transition-colors self-start">
-            Send Message
-          </button>
+          <div className="group relative">
+            <textarea 
+                rows={4}
+                required
+                className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700 resize-none"
+                placeholder="MESSAGE"
+            ></textarea>
+          </div>
+          
+          <div className="flex justify-end mt-8">
+            <button className="px-12 py-4 bg-white text-black text-sm font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-all cursor-pointer">
+                Send Transmission
+            </button>
+          </div>
         </form>
       </div>
     </section>
