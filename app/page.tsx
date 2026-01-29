@@ -4,6 +4,7 @@ import Testimonials from "@/section/testimonials";
 import Skills from "@/section/skills";
 import Services from "@/section/services";
 import Contact from "@/section/contact";
+import Footer from "@/section/footer";
 import Image from "next/image";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <Testimonials />
         <Skills />
         <Contact />
+        <Footer />
       </main>
     </div>
   );
