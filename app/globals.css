@@ -121,8 +121,17 @@
   }
   html {
     scroll-behavior: smooth;
+    overscroll-behavior-y: none;
   }
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior-y: none;
+  }
+  
+  /* Enhanced scroll snap smoothness */
+  @supports (scroll-snap-type: y mandatory) {
+    * {
+      scroll-snap-type: inherit;
+    }
   }
 }

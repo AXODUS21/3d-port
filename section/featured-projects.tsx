@@ -63,8 +63,9 @@ const FeaturedProjects = () => {
       id="work" 
       className="relative bg-zinc-950"
       style={{ 
-        scrollSnapType: 'y proximity',
-        scrollPaddingTop: '0px'
+        scrollSnapType: 'y mandatory',
+        scrollPaddingTop: '0px',
+        overscrollBehavior: 'none'
       }}
     >
       
@@ -87,7 +88,8 @@ const FeaturedProjects = () => {
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
               scrollSnapAlign: 'start',
-              scrollSnapStop: 'always'
+              scrollSnapStop: 'always',
+              willChange: 'transform'
             }}
           >
             {/* Colored gradient overlay on the background */}
