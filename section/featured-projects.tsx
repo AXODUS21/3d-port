@@ -70,8 +70,8 @@ const FeaturedProjects = () => {
       
       {/* Section Header - Sticky */}
       <div className="sticky top-0 z-0 h-screen flex flex-col items-center justify-center text-center pointer-events-none">
-         <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter text-zinc-900 select-none">
-            WORK
+         <h2 className="text-8xl md:text-[10rem] font-bold tracking-tighter text-zinc-900 select-none ">
+            Featured Projects
          </h2>
       </div>
 
