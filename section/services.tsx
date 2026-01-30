@@ -82,7 +82,7 @@ const Services = () => {
         {services.map((service, index) => (
              <div 
                 key={service.id}
-                className={`absolute inset-0 bg-linear-to-br ${service.gradient} transition-opacity duration-1000 ease-in-out ${
+                className={`absolute inset-0 bg-gradient-to-br ${service.gradient} transition-opacity duration-1000 ease-in-out ${
                     activeIndex === index ? 'opacity-100' : 'opacity-0'
                 }`}
              />
