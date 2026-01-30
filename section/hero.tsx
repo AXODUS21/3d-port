@@ -6,6 +6,8 @@ import { Environment, Center } from '@react-three/drei'
 import { LivingFluidBackground } from '@/components/living-fluid-background'
 import { Navigation } from '@/components/navigation'
 import { Model as XelltextModel } from '@/components/Xelltext'
+import TransitionLink from '@/components/transition-link'
+import { ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import * as THREE from 'three'
@@ -222,6 +224,26 @@ const Hero = (props: Props) => {
   const navTopRef = useRef<HTMLDivElement>(null)
   const navBottomRef = useRef<HTMLDivElement>(null)
   const introWordsRef = useRef<HTMLDivElement>(null)
+  const [currentTime, setCurrentTime] = React.useState<string>('')
+
+  // Update Manila time every second
+  useEffect(() => {
+    const updateTime = () => {
+      const manilaTime = new Date().toLocaleString('en-US', {
+        timeZone: 'Asia/Manila',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+      setCurrentTime(manilaTime)
+    }
+
+    updateTime() // Initial update
+    const interval = setInterval(updateTime, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="relative w-full">
@@ -241,6 +263,15 @@ const Hero = (props: Props) => {
             </Canvas>
             <LivingFluidBackground ref={fluidBgRef} className="z-10" />
 
+            {/* World Clock - Manila */}
+            <div className="absolute top-8 left-8 z-30 pointer-events-none">
+                <div className="flex flex-col gap-1 text-white font-mono">
+                    <div className="text-[10px] tracking-widest uppercase opacity-60">Manila, Philippines</div>
+                    <div className="text-2xl font-bold tracking-tight tabular-nums">{currentTime || '00:00:00'}</div>
+                    <div className="text-[10px] tracking-wider uppercase opacity-60">GMT+8</div>
+                </div>
+            </div>
+
             {/* Intro Words */}
             <div 
                 ref={introWordsRef}
@@ -253,16 +284,24 @@ const Hero = (props: Props) => {
 
             <div 
                 ref={textRef}
-                className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 pointer-events-none z-20"
+                className="absolute top-0 right-0 w-1/2 h-full flex items-center justify-center opacity-0 z-20"
             >
                 <div className="text-zinc-800 text-2xl p-10 max-w-2xl">
                 <h2 className="text-6xl font-bold tracking-tighter mb-8 text-black">About Me</h2>
-                    <p className="font-light leading-relaxed text-zinc-800 mb-6">
+                    <p className="font-light leading-relaxed text-zinc-800 mb-6 text-xl">
                         I'm a passionate full-stack developer with expertise in building modern web applications. With a strong foundation in both front-end and back-end technologies, I create seamless digital experiences that solve real-world problems.
                     </p>
-                    <p className="font-light leading-relaxed text-zinc-800">
+                    <p className="font-light leading-relaxed text-zinc-800 mb-8 text-xl">
                         My journey in web development began 5 years ago, and since then, I've worked with various clients from startups to established businesses, helping them achieve their digital goals.
                     </p>
+                    
+                    <TransitionLink 
+                      href="/about"
+                      className="group inline-flex items-center gap-2 px-6 py-2 rounded-none border-[0.5px] border-zinc-800 bg-zinc-950 text-white font-mono text-xs uppercase tracking-wider hover:bg-zinc-800 hover:text-white transition-all duration-300 pointer-events-auto"
+                    >
+                        <span className="relative z-10">Learn More</span>
+                        <ArrowUpRight className="w-3 h-3 relative z-10 transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+                    </TransitionLink>
                 </div>
             </div>
         </div>
