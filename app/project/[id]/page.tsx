@@ -67,7 +67,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       <header className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
           <TransitionLink
-            href="/"
+            href="/#work"
             className="group flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
