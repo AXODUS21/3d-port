@@ -14,13 +14,14 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef, introWordsRef }: { 
+const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef, introWordsRef, worldClockRef }: { 
     scrollContainer: React.RefObject<HTMLDivElement | null>, 
     textRef: React.RefObject<HTMLDivElement | null>, 
     fluidBgRef: React.RefObject<HTMLDivElement | null>,
     navTopRef: React.RefObject<HTMLDivElement | null>,
     navBottomRef: React.RefObject<HTMLDivElement | null>,
-    introWordsRef: React.RefObject<HTMLDivElement | null>
+    introWordsRef: React.RefObject<HTMLDivElement | null>,
+    worldClockRef: React.RefObject<HTMLDivElement | null>
 }) => {
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
@@ -79,6 +80,16 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         // Animate Intro Words AWAY (Phase 1)
         if (introWordsRef.current) {
             tl.to(introWordsRef.current, {
+                opacity: 0,
+                y: -50,
+                duration: 0.8,
+                ease: "power2.out"
+            }, 0)
+        }
+
+        // Animate World Clock AWAY (Phase 1)
+        if (worldClockRef.current) {
+            tl.to(worldClockRef.current, {
                 opacity: 0,
                 y: -50,
                 duration: 0.8,
@@ -224,6 +235,7 @@ const Hero = (props: Props) => {
   const navTopRef = useRef<HTMLDivElement>(null)
   const navBottomRef = useRef<HTMLDivElement>(null)
   const introWordsRef = useRef<HTMLDivElement>(null)
+  const worldClockRef = useRef<HTMLDivElement>(null)
   const [currentTime, setCurrentTime] = React.useState<string>('')
 
   // Update Manila time every second
@@ -258,24 +270,25 @@ const Hero = (props: Props) => {
                         navTopRef={navTopRef}
                         navBottomRef={navBottomRef}
                         introWordsRef={introWordsRef}
+                        worldClockRef={worldClockRef}
                     />
                 </Suspense>
             </Canvas>
             <LivingFluidBackground ref={fluidBgRef} className="z-10" />
 
             {/* World Clock - Manila */}
-            <div className="absolute top-8 left-8 z-30 pointer-events-none">
+            <div ref={worldClockRef} className="absolute top-4 left-4 z-30 pointer-events-none">
                 <div className="flex flex-col gap-1 text-white font-mono">
                     <div className="text-[10px] tracking-widest uppercase opacity-60">Manila, Philippines</div>
-                    <div className="text-2xl font-bold tracking-tight tabular-nums">{currentTime || '00:00:00'}</div>
-                    <div className="text-[10px] tracking-wider uppercase opacity-60">GMT+8</div>
+                    <div className="text-xl font-bold tracking-tight tabular-nums">{currentTime || '00:00:00'}</div>
+                    <div className="text-[9px] tracking-wider uppercase opacity-60">GMT+8</div>
                 </div>
             </div>
 
             {/* Intro Words */}
             <div 
                 ref={introWordsRef}
-                className="absolute inset-0 flex items-center justify-between w-full pointer-events-none z-30 mix-blend-difference"
+                className="absolute inset-0 flex items-center justify-between w-full px-4 pointer-events-none z-30 mix-blend-difference"
             >
                 <span className="text-white text-[10px] font-mono tracking-widest uppercase">Materializing</span>
                 <span className="text-white text-[10px] font-mono tracking-widest uppercase -translate-x-[45px]">the</span>
