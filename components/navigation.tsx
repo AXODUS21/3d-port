@@ -31,6 +31,7 @@ export const Navigation = ({ topRef, bottomRef }: { topRef: React.RefObject<HTML
         <nav className="flex items-center gap-1 p-1 bg-zinc-950 pointer-events-auto">
            {[
              { name: 'Projects', id: 'work' },
+             { name: 'Experiences', id: 'experiences' },
              { name: 'Testimonials', id: 'testimonials' },
              { name: 'Skills', id: 'skills' },
              { name: 'Services', id: 'services' }
