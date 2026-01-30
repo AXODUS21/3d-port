@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react'
 import { ArrowUpRight } from 'lucide-react'
+import TransitionLink from '@/components/transition-link'
 
 const projects = [
   {
@@ -99,10 +100,13 @@ const FeaturedProjects = () => {
                             ))}
                         </div>
 
-                        <button className="group flex items-center gap-2 text-white border-b border-white/20 pb-1 hover:border-white transition-all">
-                            <span className="uppercase tracking-widest text-sm font-bold">View Case Study</span>
+                        <TransitionLink 
+                          href={`/project/${project.id}`}
+                          className="group flex items-center gap-2 text-white border-b border-white/20 pb-1 hover:border-white transition-all"
+                        >
+                            <span className="uppercase tracking-widest text-sm font-bold">More Details</span>
                             <ArrowUpRight className="w-4 h-4 transform group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        </TransitionLink>
                     </div>
                 </div>
             </div>
