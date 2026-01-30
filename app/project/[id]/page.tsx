@@ -1,11 +1,15 @@
 'use client'
 
+import { use } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react'
 import TransitionLink from '@/components/transition-link'
 
-export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  
+  // Unwrap the params Promise using React.use()
+  const { id } = use(params)
   
   // Sample project data - in a real app, you'd fetch this based on the ID
   const projects: Record<string, any> = {
@@ -55,7 +59,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     },
   }
 
-  const project = projects[params.id] || projects['1']
+  const project = projects[id] || projects['1']
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">

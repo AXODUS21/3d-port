@@ -20,9 +20,19 @@ export default function TransitionLink({ href, children, className }: Transition
     // Start the transition animation
     startTransition()
     
+    // Check if there's a hash in the URL
+    const hasHash = href.includes('#')
+    const [path, hash] = href.split('#')
+    
+    if (hasHash && hash) {
+      // Store the hash in sessionStorage for the target page to handle
+      sessionStorage.setItem('pendingHashScroll', hash)
+      console.log('Stored hash for scrolling:', hash)
+    }
+    
     // Wait for the animation to cover the screen, then navigate
     setTimeout(() => {
-      router.push(href)
+      router.push(path || href)
     }, 400) // Half of the transition duration to navigate when screen is covered
   }
 
