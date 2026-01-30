@@ -217,7 +217,7 @@ const Experiences = () => {
       className="relative bg-zinc-950 py-32 overflow-hidden"
     >
       {/* Animated Background Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" suppressHydrationWarning>
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
