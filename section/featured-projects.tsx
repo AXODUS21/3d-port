@@ -105,7 +105,7 @@ const FeaturedProjects = () => {
 
                 {/* Overlays */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${project.bgColor} opacity-90 transition-opacity duration-500 group-hover:opacity-80`} />
-                <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] group-hover:backdrop-blur-none transition-all duration-500" />
+                <div className="absolute inset-0 bg-black/20 transition-all duration-500" />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/40" />
 
                 {/* Content Container - Full Screen with Padding */}
