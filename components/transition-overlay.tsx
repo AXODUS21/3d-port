@@ -1,21 +1,46 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { useTransitionStore } from '@/lib/transition-store'
 
 export default function TransitionOverlay() {
-  const { isTransitioning, endTransition } = useTransitionStore()
+  const { isTransitioning, endTransition, shouldWaitForContent } = useTransitionStore()
+  const pathname = usePathname()
+  const [isMinDurationDone, setIsMinDurationDone] = useState(false)
+  const prevPathname = useRef(pathname)
+
+  // Track the path we started from
+  useEffect(() => {
+    if (!isTransitioning) {
+      prevPathname.current = pathname
+      setIsMinDurationDone(false)
+    }
+  }, [isTransitioning, pathname])
 
   useEffect(() => {
     if (isTransitioning) {
-      // End transition after animation completes
+      // Minimum duration for the "enter" animation phase
       const timer = setTimeout(() => {
-        endTransition()
-      }, 1000) // Match this with animation duration
+        setIsMinDurationDone(true)
+      }, 700) 
 
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(timer)
+      }
     }
   }, [isTransitioning, endTransition])
+
+  useEffect(() => {
+    if (isTransitioning && isMinDurationDone) {
+      // Logic for ending the transition:
+      // 1. If we shouldn't wait for content (e.g. same page), end immediately.
+      // 2. If we SHOULD wait, check if the pathname has changed.
+      if (!shouldWaitForContent || pathname !== prevPathname.current) {
+        endTransition()
+      }
+    }
+  }, [isTransitioning, isMinDurationDone, shouldWaitForContent, pathname, prevPathname, endTransition])
 
   return (
     <>
