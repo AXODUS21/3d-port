@@ -126,9 +126,9 @@ const Services = () => {
                 <div>
                      <div className="flex items-center gap-2 mb-2">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
-                        <span className="text-white font-bold tracking-wider text-sm">Service</span>
+                        <span className="text-white font-mono tracking-[0.2em] text-sm uppercase">Service</span>
                      </div>
-                     <h2 className="text-5xl md:text-7xl font-bold text-white tracking-widest mt-4">
+                     <h2 className="text-5xl md:text-7xl font-bold font-mono text-white tracking-widest mt-4">
                         service
                      </h2>
                 </div>
@@ -156,7 +156,7 @@ const Services = () => {
                                     <div className="w-1 h-1 bg-white/20 rounded-full" />
                                 </div>
                                 
-                                <span className={`text-sm font-bold tracking-wider uppercase transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white/80'}`}>
+                                <span className={`text-xs font-mono tracking-widest uppercase transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white/80'}`}>
                                     {service.menuTitle}
                                 </span>
                             </motion.div>
@@ -186,18 +186,18 @@ const Services = () => {
                                      {/* Category */}
                                     <div className="flex items-center gap-2 mb-6 shrink-0">
                                         <div className="w-1.5 h-1.5 bg-black rounded-full" />
-                                        <span className="text-xs font-bold tracking-widest uppercase opacity-70">
+                                        <span className="text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase opacity-70">
                                             {service.menuTitle}
                                         </span>
                                     </div>
                                     
                                     {/* Main Title */}
-                                    <h3 className="text-3xl md:text-4xl font-extrabold leading-tight whitespace-pre-line mb-8 shrink-0">
+                                    <h3 className="text-3xl md:text-4xl font-bold tracking-tighter leading-tight whitespace-pre-line mb-6 shrink-0">
                                         {service.title}
                                     </h3>
 
                                      {/* Description */}
-                                    <p className="text-sm md:text-base leading-relaxed opacity-80 font-medium text-justify">
+                                    <p className="text-sm md:text-base leading-relaxed text-zinc-600 font-normal text-justify">
                                         {service.description}
                                     </p>
                                 </div>
