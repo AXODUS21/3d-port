@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { useLenis } from '@/components/smooth-scroll'
+import TransitionLink from '@/components/transition-link'
 
 const services = [
   {
@@ -208,13 +209,12 @@ const Services = () => {
 
                     {/* Bottom Action Button - Static */}
                     <div className="p-8 pt-0 flex justify-end relative z-10 bg-white/0"> 
-                    {/* bg-white/0 because it's over the white card bg. If the scrolling content text overlaps, we might need gradient or solid bg for button area. 
-                        Given the design, let's keep it simple. If text overlaps, user might want fading mask. 
-                        For now, assuming text fits within the 'page' or slides behind.
-                    */}
-                       <button className="bg-black text-white p-4 hover:bg-zinc-800 transition-colors duration-300 z-20">
+                       <TransitionLink 
+                            href={`/service/${services[activeIndex].id}`}
+                            className="bg-black text-white p-4 hover:bg-zinc-800 transition-colors duration-300 z-20 cursor-pointer inline-flex items-center justify-center"
+                       >
                             <ArrowRight className="w-5 h-5" />
-                        </button>
+                        </TransitionLink>
                     </div>
 
                 </div>
