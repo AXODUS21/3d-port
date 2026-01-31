@@ -43,7 +43,6 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
                 scrub: 1,
                 pin: true,
                 // markers: true,
-                onRefresh: (self) => console.log("refreshed", self), // Debug aid
             }
         })
 

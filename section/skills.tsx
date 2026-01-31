@@ -44,12 +44,12 @@ const skillsData: SkillCategory[] = [
   }
 ]
 
+// Memoize duplicated data to ensure seamless looping (x4 for safety on large screens)
+const infiniteSkills = [...skillsData, ...skillsData, ...skillsData, ...skillsData]
+
 const Skills = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-
-  // Memoize duplicated data to ensure seamless looping (x4 for safety on large screens)
-  const infiniteSkills = [...skillsData, ...skillsData, ...skillsData, ...skillsData]
 
   useEffect(() => {
     const track = trackRef.current
@@ -125,6 +125,7 @@ const Skills = () => {
         <div 
           ref={trackRef}
           className="flex gap-8 w-max px-4"
+          style={{ willChange: 'transform' }}
         >
           {infiniteSkills.map((skill, index) => (
             <div 

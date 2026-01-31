@@ -44,7 +44,6 @@ export default function TransitionLink({ href, children, className }: Transition
     if (hasHash && hash) {
       // Store the hash in sessionStorage for the target page to handle
       sessionStorage.setItem('pendingHashScroll', hash)
-      console.log('Stored hash for scrolling:', hash)
     }
     
     // Wait for the animation to cover the screen, then navigate

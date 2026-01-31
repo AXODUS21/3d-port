@@ -14,8 +14,6 @@ export default function HashScrollHandler() {
       // Clear it immediately
       sessionStorage.removeItem('pendingHashScroll')
       
-      console.log('HashScrollHandler: Will scroll to', pendingHash)
-      
       // Wait for the page to fully render
       const scrollToHash = () => {
         // First scroll to top
@@ -30,10 +28,8 @@ export default function HashScrollHandler() {
           if (element) {
             const y = element.getBoundingClientRect().top + window.pageYOffset
             window.scrollTo({ top: y, behavior: 'instant' as ScrollBehavior })
-            console.log('✅ Successfully scrolled to:', pendingHash, 'at position:', y)
           } else {
             attempts++
-            console.log(`❌ Attempt ${attempts}: Element "${pendingHash}" not found yet`)
             if (attempts < maxAttempts) {
               setTimeout(tryScroll, 50)
             }

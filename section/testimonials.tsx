@@ -78,6 +78,9 @@ const testimonialsData: Testimonial[] = [
   }
 ]
 
+// Duplicate data for infinite loop
+const infiniteTestimonials = [...testimonialsData, ...testimonialsData, ...testimonialsData, ...testimonialsData]
+
 const Testimonials = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -85,9 +88,6 @@ const Testimonials = () => {
   const [modalVideo, setModalVideo] = useState<Testimonial | null>(null)
   const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set()) // Track muted state by unique composite ID
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map()) // Map uses composite ID
-
-  // Duplicate data for infinite loop
-  const infiniteTestimonials = [...testimonialsData, ...testimonialsData, ...testimonialsData, ...testimonialsData]
 
   useEffect(() => {
     const track = trackRef.current
@@ -208,6 +208,7 @@ const Testimonials = () => {
           <div 
             ref={trackRef}
             className="flex gap-8 w-max px-4"
+            style={{ willChange: 'transform' }}
           >
              {infiniteTestimonials.map((item, index) => {
                const compositeId = getCompositeId(item.id, index)
