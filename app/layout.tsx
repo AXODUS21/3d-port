@@ -30,9 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <SmoothScroll />
-        <TransitionOverlay />
-        {children}
+        <SmoothScroll>
+          <TransitionOverlay />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

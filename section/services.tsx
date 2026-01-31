@@ -1,171 +1,226 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
+import { useLenis } from '@/components/smooth-scroll'
 
-// Simple scroll listener is enough for this "sticky section" pattern.
+const services = [
+  {
+    id: "01",
+    menuTitle: "Brand Design",
+    title: "Brand identity\n& structure",
+    description: "We build distinct brand identities that resonate with your audience. From logo design to comprehensive style guides, we ensure your brand communicates its value clearly and consistently across all touchpoints.",
+    bgClass: "bg-zinc-900" 
+  },
+  {
+    id: "02",
+    menuTitle: "UI/UX Design",
+    title: "User Interface\n& Experience",
+    description: "Designing intuitive and aesthetically pleasing user interfaces that drive engagement. We prioritize user journey and accessibility above all to create seamless digital experiences.",
+    bgClass: "bg-zinc-800"
+  },
+  {
+    id: "03",
+    menuTitle: "Web Development",
+    title: "Front-end/\nCMS development",
+    description: "We implement optimized code without compromising beautiful design. We provide immersive experiences with 3D and animations while achieving high Core Web Vitals scores. We offer sustainable front-end development that balances customer satisfaction and SEO.",
+    bgClass: "bg-neutral-900"
+  },
+  {
+    id: "04",
+    menuTitle: "3D & Motion",
+    title: "3D animation and\nmotion graphics",
+    description: "We create immersive worldviews using advanced technologies such as WebGL, AR, and Infographics. We enhance brand experiences through stunning creative content. We offer consistent support from planning to production enabling us to deliver results that directly connect to your business goals.",
+    bgClass: "bg-stone-900"
+  }
+]
 
 const Services = () => {
   const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  const services = [
-    {
-      id: "01",
-      title: "Web Development",
-      description: "Building fast, responsive, and accessible websites using modern frameworks and best practices. We focus on clean code and scalable architecture.",
-      gradient: "from-blue-600/20 via-indigo-900/20 to-black"
-    },
-    {
-        id: "02",
-      title: "3D Experiences",
-      description: "Creating immersive 3D web experiences with Three.js and WebGL. Turn passive viewers into active participants with interactive storytelling.",
-      gradient: "from-purple-600/20 via-pink-900/20 to-black"
-    },
-    {
-        id: "03",
-      title: "UI/UX Design",
-      description: "Designing intuitive and aesthetically pleasing user interfaces that drive engagement. We prioritize user journey and accessibility above all.",
-      gradient: "from-orange-600/20 via-red-900/20 to-black"
-    },
-    {
-        id: "04",
-      title: "Technical Strategy",
-      description: "Consulting on architecture, tech stack selection, and scalability planning. We help businesses make informed decisions for long-term success.",
-      gradient: "from-emerald-600/20 via-teal-900/20 to-black"
-    }
-  ]
+  const lenis = useLenis()
+  
+  // Motion value to track scroll progress (0 to 1)
+  const scrollYProgress = useMotionValue(0)
+  
+  // Transform scroll progress to vertical translation (0% to -300%)
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", `-${(services.length - 1) * 100}%`])
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
+    // Shared scroll handler
+    const updateScroll = () => {
+        if (!containerRef.current) return
 
-      const { top, height } = containerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Calculate how far we are scrolled through the section
-      // The section starts scrolling when top reaches 0 (or slightly before/after depending on sticky)
-      // We want to map the scroll progress to the service index.
-      
-      // We have services.length items. 
-      // Let's say the total scrollable height is (services.length + 1) * windowHeight (handled by CSS height)
-      // effectively we want to switch when we scroll past each "page"
-      
-      const scrollDistance = -top;
-      const sectionHeight = height - windowHeight; // available scrollable distance
-      
-      if (sectionHeight <= 0) return;
+        const { top, height } = containerRef.current.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+        
+        const scrollDistance = -top
+        const sectionHeight = height - windowHeight
 
-      // Determine index based on scroll position
-      // We want the changes to happen as we scroll through.
-      const rawIndex = Math.floor((scrollDistance / sectionHeight) * services.length);
-      const clampedIndex = Math.max(0, Math.min(services.length - 1, rawIndex));
-      
-      setActiveIndex(clampedIndex);
-    };
+        // Calculate continuous progress
+        const progress = Math.max(0, Math.min(1, scrollDistance / sectionHeight))
+        
+        // Update framer motion value directly for smooth animation
+        scrollYProgress.set(progress)
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [services.length]);
+        // Calculate discrete index for background/nav
+        const rawIndex = Math.floor(progress * services.length)
+        const clampedIndex = Math.max(0, Math.min(services.length - 1, rawIndex))
+        
+        setActiveIndex(clampedIndex)
+    }
+
+    if (lenis) {
+       lenis.on('scroll', updateScroll)
+       updateScroll() // Initial check
+       return () => {
+           lenis.off('scroll', updateScroll)
+       }
+    } else {
+       window.addEventListener('scroll', updateScroll)
+       updateScroll()
+       return () => window.removeEventListener('scroll', updateScroll)
+    }
+  }, [lenis, scrollYProgress])
 
   return (
     <section 
-        ref={containerRef} 
-        id="services" 
-        className="relative bg-zinc-950"
-        style={{ height: `${(services.length + 1) * 100}vh` }} // Make the section tall enough to scroll through
+      ref={containerRef} 
+      id="services" 
+      className="relative bg-black"
+      // Height allows for scrolling through all items
+      style={{ height: `${services.length * 100 + 50}vh` }} 
     >
       
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col">
         
-        {/* Dynamic Background */}
-        {services.map((service, index) => (
-             <div 
-                key={service.id}
-                className={`absolute inset-0 bg-gradient-to-br ${service.gradient} transition-opacity duration-1000 ease-in-out ${
-                    activeIndex === index ? 'opacity-100' : 'opacity-0'
-                }`}
-             />
-        ))}
-        
-        {/* Static Background Elements */}
-         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none" />
+        {/* Background Layer - retained snap/fade effect */}
+        <div className="absolute inset-0 -z-10">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div
+              key={activeIndex}
+              className={`absolute inset-0 ${services[activeIndex].bgClass}`}
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              exit={{ y: "-100%" }}
+              transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }} 
+            >
+                 <div className="absolute inset-0 opacity-20" 
+                      style={{ 
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+                      }} 
+                 />
+                 <div className={`absolute inset-0 bg-linear-to-t from-black/80 to-transparent`} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-
-        {/* Centered Fixed Card */}
-        <div className="relative z-10 max-w-2xl w-full mx-6 h-[500px] flex flex-col justify-center"> 
-             {/* The card container itself doesn't move, but content inside transitions */}
+        {/* Content Layer */}
+        <div className="relative z-10 w-full h-full p-4 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-[1920px] mx-auto">
             
-            <div className="bg-zinc-950/40 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden p-12 h-full relative group hover:border-white/20 transition-colors duration-500">
+            {/* Left Column: Title & Logic */}
+            <div className="lg:col-span-4 h-full flex flex-col justify-between py-12 lg:py-8 pl-4 lg:pl-0">
                 
-                {/* Decoration */}
-                <div className="absolute top-0 right-0 p-[200px] bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                {/* Section Title */}
+                <div>
+                     <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <span className="text-white font-bold tracking-wider text-sm">Service</span>
+                     </div>
+                     <h2 className="text-5xl md:text-7xl font-bold text-white tracking-widest mt-4">
+                        service
+                     </h2>
+                </div>
 
-                 {/* Content Wrapper with Roulette Transition */}
-                <div className="relative h-full flex flex-col justify-between">
-                    
-                    {/* Top Tag */}
-                    <div className="h-10 overflow-hidden relative">
-                         {services.map((service, index) => (
-                            <span 
+                {/* Navigation List */}
+                <div className="hidden lg:flex flex-col gap-6 mt-auto">
+                    {services.map((service, index) => {
+                        const isActive = activeIndex === index
+                        return (
+                            <motion.div 
                                 key={service.id}
-                                className={`absolute top-0 left-0 inline-block text-zinc-500 font-mono text-sm tracking-widest border border-zinc-800 px-3 py-1 rounded-full uppercase transition-all duration-500 ease-out transform ${
-                                    activeIndex === index 
-                                    ? 'opacity-100 translate-y-0' 
-                                    : activeIndex > index 
-                                        ? 'opacity-0 -translate-y-8' 
-                                        : 'opacity-0 translate-y-8'
-                                }`}
+                                className="flex items-center gap-4 cursor-pointer group"
+                                initial={false}
+                                animate={{ opacity: isActive ? 1 : 0.5, x: isActive ? 10 : 0 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                Step {service.id}
-                            </span>
-                        ))}
-                    </div>
-
-
-                    {/* Title & Desc */}
-                    <div className="relative flex-1 py-8">
-                        {services.map((service, index) => (
-                             <div 
-                                key={service.id}
-                                className={`absolute top-0 left-0 w-full transition-all duration-700 ease-out transform flex flex-col justify-center h-full ${
-                                    activeIndex === index 
-                                    ? 'opacity-100 translate-y-0 blur-0' 
-                                    : activeIndex > index 
-                                        ? 'opacity-0 -translate-y-12 blur-sm' 
-                                        : 'opacity-0 translate-y-12 blur-sm'
-                                }`}
-                             >
-                                <h3 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-                                    {service.title}
-                                </h3>
+                                <div className="w-2 relative flex items-center justify-center">
+                                    {isActive && (
+                                        <motion.div 
+                                            layoutId="activeServiceDot"
+                                            className="w-2 h-2 bg-white rounded-full absolute"
+                                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                        />
+                                    )}
+                                    <div className="w-1 h-1 bg-white/20 rounded-full" />
+                                </div>
                                 
-                                <p className="text-lg md:text-xl text-zinc-300 leading-relaxed font-light">
-                                    {service.description}
-                                </p>
-                            </div>
-                        ))}
+                                <span className={`text-sm font-bold tracking-wider uppercase transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white/80'}`}>
+                                    {service.menuTitle}
+                                </span>
+                            </motion.div>
+                        )
+                    })}
+                </div>
+            </div>
+
+            {/* Center/Right Column: Active Card */}
+            <div className="lg:col-span-8 flex justify-center lg:justify-start items-center h-full">
+                
+                <div className="relative bg-white text-black w-full max-w-md aspect-3/4 md:aspect-4/5 lg:aspect-3/4 lg:max-h-[600px] shadow-2xl overflow-hidden flex flex-col">
+                    
+                    {/* Floating Content Container */}
+                    <div className="flex-1 relative overflow-hidden">
+                        
+                        {/* The scrolling stack */}
+                        <motion.div 
+                            className="absolute top-0 left-0 w-full h-full"
+                            style={{ y }} 
+                        >
+                            {services.map((service) => (
+                                <div 
+                                    key={service.id}
+                                    className="w-full h-full p-8 md:p-12 flex flex-col justify-start pt-16" // pt-16 to give space from top
+                                >
+                                     {/* Category */}
+                                    <div className="flex items-center gap-2 mb-6 shrink-0">
+                                        <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                                        <span className="text-xs font-bold tracking-widest uppercase opacity-70">
+                                            {service.menuTitle}
+                                        </span>
+                                    </div>
+                                    
+                                    {/* Main Title */}
+                                    <h3 className="text-3xl md:text-4xl font-extrabold leading-tight whitespace-pre-line mb-8 shrink-0">
+                                        {service.title}
+                                    </h3>
+
+                                     {/* Description */}
+                                    <p className="text-sm md:text-base leading-relaxed opacity-80 font-medium text-justify">
+                                        {service.description}
+                                    </p>
+                                </div>
+                            ))}
+                        </motion.div>
+                        
                     </div>
 
-                    {/* Button */}
-                    <div className="mt-auto h-8 overflow-hidden relative">
-                        <div className="flex items-center gap-4 text-sm font-medium text-white/50 group-hover:text-white transition-colors cursor-pointer">
-                             <span className="uppercase tracking-widest">Read Details</span>
-                             <div className="w-8 h-[1px] bg-current" />
-                        </div>
+                    {/* Bottom Action Button - Static */}
+                    <div className="p-8 pt-0 flex justify-end relative z-10 bg-white/0"> 
+                    {/* bg-white/0 because it's over the white card bg. If the scrolling content text overlaps, we might need gradient or solid bg for button area. 
+                        Given the design, let's keep it simple. If text overlaps, user might want fading mask. 
+                        For now, assuming text fits within the 'page' or slides behind.
+                    */}
+                       <button className="bg-black text-white p-4 hover:bg-zinc-800 transition-colors duration-300 z-20">
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
                     </div>
 
                 </div>
 
             </div>
 
-        </div>
-
-        {/* Large Background Text (Optional - can be static or change) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none">
-             <h2 className="text-[12rem] md:text-[20rem] font-bold tracking-tighter text-white/2 select-none whitespace-nowrap">
-                SERVICES
-            </h2>
         </div>
 
       </div>

@@ -1,11 +1,19 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import Lenis from 'lenis'
 
-export const SmoothScroll = () => {
+// Create a context for the Lenis instance
+const LenisContext = createContext<Lenis | null>(null)
+
+// Custom hook to use Lenis instance
+export const useLenis = () => useContext(LenisContext)
+
+export const SmoothScroll = ({ children }: { children?: React.ReactNode }) => {
+  const [lenis, setLenis] = useState<Lenis | null>(null)
+
   useEffect(() => {
-    const lenis = new Lenis({
+    const lenisInstance = new Lenis({
         duration: 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
         orientation: 'vertical',
@@ -15,17 +23,25 @@ export const SmoothScroll = () => {
         touchMultiplier: 2,
     })
 
+    setLenis(lenisInstance)
+
     function raf(time: number) {
-      lenis.raf(time)
+      lenisInstance.raf(time)
       requestAnimationFrame(raf)
     }
 
     requestAnimationFrame(raf)
 
     return () => {
-       lenis.destroy()
+       lenisInstance.destroy()
+       setLenis(null)
     }
   }, [])
 
-  return null
+  return (
+    <LenisContext.Provider value={lenis}>
+      {children}
+    </LenisContext.Provider>
+  )
 }
+
