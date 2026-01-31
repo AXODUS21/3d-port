@@ -76,69 +76,83 @@ const FeaturedProjects = () => {
          </h2>
       </div>
 
-      {/* Stacking Cards with Background Images */}
       <div className="relative z-10 -mt-[100vh]">
         {projects.map((project, index) => (
           <div 
             key={project.id}
-            className="sticky top-0 h-screen w-full flex items-center justify-center"
+            className="sticky top-0 h-screen w-full"
             style={{
-              backgroundImage: `url(${project.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
               scrollSnapAlign: 'start',
               scrollSnapStop: 'always',
               willChange: 'transform'
             }}
           >
-            {/* Colored gradient overlay on the background */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${project.bgColor}`} />
-            
-            {/* Dark overlay for better contrast */}
-            <div className="absolute inset-0 bg-black/40" />
+            {/* Clickable Wrapper - Full Screen */}
+            <TransitionLink 
+                href={`/project/${project.id}`}
+                className="block w-full h-full relative group cursor-pointer overflow-hidden"
+            >
+                {/* Background Image */}
+                <div 
+                    className="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+                    style={{
+                        backgroundImage: `url(${project.image})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                    }}
+                />
 
-            {/* Semi-transparent Card */}
-            <div className="relative z-10 w-full h-full md:w-[90%] md:h-[90%] border border-white/20 md:rounded-3xl overflow-hidden shadow-2xl">
-                {/* Card semi-transparent background */}
-                <div className="w-full h-full p-8 md:p-16 flex flex-col justify-between bg-zinc-900/60 backdrop-blur-sm">
-                    <div>
-                        <div className="flex items-center justify-between mb-8">
-                            <span className="text-zinc-200 font-mono text-sm tracking-wider">0{project.id} / 05</span>
-                            <span className="text-zinc-200 font-mono text-sm tracking-wider">{project.year}</span>
+                {/* Overlays */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${project.bgColor} opacity-90 transition-opacity duration-500 group-hover:opacity-80`} />
+                <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] group-hover:backdrop-blur-none transition-all duration-500" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/40" />
+
+                {/* Content Container - Full Screen with Padding */}
+                <div className="relative z-10 w-full h-full p-8 md:p-20 flex flex-col justify-between">
+                    
+                    {/* Top Bar */}
+                    <div className="flex justify-between items-start border-b border-white/10 pb-6">
+                        <div className="flex flex-col">
+                            <span className="text-zinc-300 font-mono text-xs tracking-[0.2em] uppercase mb-2">Project {String(project.id).padStart(2, '0')}</span>
+                            <span className="text-white font-bold text-xl tracking-tight">{project.year}</span>
                         </div>
-                        
-                        <h3 className="text-4xl md:text-6xl font-bold text-white mb-2 leading-tight tracking-tight">
-                            {project.title}
-                        </h3>
-                        <p className="text-xl text-zinc-100 mb-8 font-light">
-                            {project.category}
-                        </p>
-                        
-                        <p className="text-zinc-50 leading-relaxed max-w-md text-lg">
-                            {project.description}
-                        </p>
+                        <div className="hidden md:flex items-center gap-2 text-white/50 group-hover:text-white transition-colors">
+                            <span className="font-mono text-xs uppercase tracking-widest">Explore Case Study</span>
+                            <ArrowUpRight className="w-5 h-5" />
+                        </div>
                     </div>
 
-                    <div>
-                        <div className="flex flex-wrap gap-2 mb-8">
-                            {project.tags.map(tag => (
-                                <span key={tag} className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs text-zinc-100 font-mono uppercase tracking-wider">
-                                    {tag}
-                                </span>
-                            ))}
+                    {/* Main Content - Bottom Aligned */}
+                    <div className="max-w-4xl">
+                        <div className="overflow-hidden mb-4">
+                            <h3 className="text-6xl md:text-9xl font-black text-white leading-[0.9] tracking-tighter uppercase transform translate-y-0 transition-transform duration-500">
+                                {project.title}
+                            </h3>
                         </div>
+                        
+                        <div className="flex flex-col md:flex-row md:items-end gap-8 md:gap-16">
+                            <div className="flex-1">
+                                <p className="text-2xl md:text-3xl text-zinc-200 font-light mb-6">
+                                    {project.category}
+                                </p>
+                                <p className="text-zinc-400 leading-relaxed max-w-xl text-lg md:text-xl line-clamp-3 group-hover:text-white transition-colors duration-300">
+                                    {project.description}
+                                </p>
+                            </div>
 
-                        <TransitionLink 
-                          href={`/project/${project.id}`}
-                          className="group flex items-center gap-2 text-white border-b border-white/50 pb-1 hover:border-white transition-all w-fit"
-                        >
-                            <span className="uppercase tracking-widest text-sm font-bold">More Details</span>
-                            <ArrowUpRight className="w-4 h-4 transform group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-                        </TransitionLink>
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2 content-end">
+                                {project.tags.map(tag => (
+                                    <span key={tag} className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-zinc-300 font-mono uppercase tracking-wider group-hover:bg-white group-hover:text-black transition-colors duration-300">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </TransitionLink>
           </div>
         ))}
       </div>
