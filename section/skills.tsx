@@ -48,89 +48,93 @@ const Skills = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
+  // Memoize duplicated data to ensure seamless looping (x4 for safety on large screens)
+  const infiniteSkills = [...skillsData, ...skillsData, ...skillsData, ...skillsData]
+
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
-    
+    const track = trackRef.current
+    if (!track) return
+
+    // Calculate total width of one set of items to determine duration
+    // But simplest box-standard infinite scroll is just linear movement
+    // Let's use a simple distinct GSAP animation
     const ctx = gsap.context(() => {
-      const track = trackRef.current
-      const section = sectionRef.current
-      
-      if (!track || !section) return
-
-      const mm = gsap.matchMedia()
-
-      mm.add("(min-width: 768px)", () => {
-        // Reverse Horizontal Scroll: Start at the END (Right) and scroll to BEGINNING (Left)
-        // This makes the content move from Left to Right visual direction as you scroll down
+        const totalWidth = track.scrollWidth / 2 // Approximate since we duplicated many times, but actually we just need to move by 1/4th if we duplicated 4 times? 
+        // Better approach: Measure width of the *original* set. 
+        // Just moving the whole track from 0 to -50% and repeating works perfectly if we have 2 sets. 
+        // With 4 sets, we can move from 0 to -25% (one full set width) and repeat.
         
-        gsap.fromTo(track, 
-          { 
-            x: () => -(track.scrollWidth - window.innerWidth) 
-          },
-          {
-            x: 0,
+        // Let's rely on the fact that we have enough duplicates.
+        // We move purely by percentage of the track width for simplicity if items are uniform, 
+        // but items might have gaps.
+        
+        gsap.to(track, {
+            xPercent: -50, // Move halfway. We need at least 2 full copies. infiniteSkills has 4 copies.
+            // If we move -50%, we move past 2 copies. So we need to ensure the visual loop is perfect.
+            // Actually, if we have 4 copies, moving -25% is safest as it replaces the first set with determining second set.
             ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: "bottom bottom",
-              scrub: 1,
-              invalidateOnRefresh: true,
-            }
-          }
-        )
-      })
-
+            duration: 20, // Adjust speed here
+            repeat: -1,
+        })
     }, sectionRef)
 
     return () => ctx.revert()
   }, [])
 
+  const handleMouseEnter = () => {
+    gsap.getTweensOf(trackRef.current).forEach(t => t.pause())
+  }
+  
+  const handleMouseLeave = () => {
+    gsap.getTweensOf(trackRef.current).forEach(t => t.resume())
+  }
+
   return (
     <section 
       ref={sectionRef} 
       id="skills" 
-      className="relative bg-zinc-950 h-[300vh]" // Explicit scroll height
+      className="relative bg-zinc-950 py-32 overflow-hidden flex flex-col justify-center min-h-screen" 
     >
-        
-      {/* Sticky Viewport - Solid Background to prevent clipping */}
-      <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden bg-zinc-950 z-30">
-        
-        {/* Background Decor */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-        
-        {/* Large BACKGROUND TEXT */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-0 pointer-events-none opacity-[0.03] select-none">
-             <h2 className="text-[20vw] font-black text-white whitespace-nowrap">
-                CAPABILITIES
-            </h2>
-        </div>
-
-        {/* Header - Now Relative Flex Item taking real space */}
-        <div className="w-full pt-16 px-8 md:px-16 z-20 pointer-events-none mix-blend-difference shrink-0">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-px bg-white/50" />
-            <span className="text-sm font-mono text-white/50 tracking-[0.2em]">03 // CAPABILITIES</span>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
-            Technical<br/>Arsenal
+      {/* Background Decor */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      
+      {/* Large BACKGROUND TEXT */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none opacity-[0.03] select-none">
+           <h2 className="text-[20vw] font-black text-white whitespace-nowrap">
+              CAPABILITIES
           </h2>
-        </div>
+      </div>
 
-        {/* Scroll Track - Takes remaining space */}
+      {/* Header */}
+      <div className="container mx-auto px-8 md:px-16 mb-16 z-20 relative mix-blend-difference">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-12 h-px bg-white/50" />
+          <span className="text-sm font-mono text-white/50 tracking-[0.2em]">03 // CAPABILITIES</span>
+        </div>
+        <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
+          Technical<br/>Arsenal
+        </h2>
+      </div>
+
+      {/* Scroll Track */}
+      <div 
+        className="w-full overflow-hidden z-10"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div 
           ref={trackRef}
-          className="flex-1 flex gap-8 px-8 md:px-[20vw] overflow-x-auto md:overflow-visible items-center hide-scrollbar relative z-10"
+          className="flex gap-8 w-max px-4"
         >
-          {skillsData.map((skill, index) => (
+          {infiniteSkills.map((skill, index) => (
             <div 
-              key={skill.id}
-              className="relative shrink-0 w-[85vw] md:w-[550px] h-[550px] md:h-[450px] bg-zinc-900/40 border border-white/10 backdrop-blur-sm group hover:border-white/30 transition-all duration-500 overflow-hidden flex flex-col"
+              key={`${skill.id}-${index}`}
+              className="relative shrink-0 w-[85vw] md:w-[450px] h-[450px] bg-zinc-900/40 border border-white/10 backdrop-blur-sm group hover:border-white/30 transition-all duration-500 overflow-hidden flex flex-col"
             >
               {/* Card Header */}
-              <div className="p-8 border-b border-white/5 bg-white/5 flex justify-between items-start">
+              <div className="p-6 border-b border-white/5 bg-white/5 flex justify-between items-start">
                   <div>
-                    <h3 className="text-2xl font-bold text-white uppercase tracking-tight mb-2 group-hover:text-zinc-200 transition-colors">
+                    <h3 className="text-xl font-bold text-white uppercase tracking-tight mb-2 group-hover:text-zinc-200 transition-colors">
                         {skill.category}
                     </h3>
                     <p className="text-zinc-500 font-mono text-xs max-w-[280px]">
@@ -143,10 +147,10 @@ const Skills = () => {
               </div>
 
               {/* Technologies Grid */}
-              <div className="p-8 flex-1">
-                  <div className="grid grid-cols-2 gap-4 h-full content-start">
+              <div className="p-6 flex-1">
+                  <div className="grid grid-cols-2 gap-3 h-full content-start">
                      {skill.technologies.map((tech, i) => (
-                        <div key={i} className="flex items-center gap-3 group/tech">
+                        <div key={i} className="flex items-center gap-2 group/tech">
                              <div className="w-1.5 h-1.5 bg-zinc-700 rounded-sm group-hover/tech:bg-white transition-colors" />
                              <span className="text-zinc-400 font-mono text-sm group-hover/tech:text-zinc-200 transition-colors">
                                 {tech}
@@ -168,14 +172,13 @@ const Skills = () => {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Decoder Line */}
-        <div className="absolute bottom-16 left-0 w-full flex justify-center pointer-events-none opacity-50">
-            <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-600 uppercase tracking-[0.5em]">
-                Scroll to Inspect Modules
-            </div>
-        </div>
-
+      {/* Decoder Line */}
+      <div className="w-full flex justify-center mt-12 opacity-50">
+          <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-600 uppercase tracking-[0.5em]">
+              Hover to Pause / Analysis Mode
+          </div>
       </div>
     </section>
   )
