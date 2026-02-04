@@ -3,6 +3,8 @@ import FeaturedProjects from "@/section/featured-projects";
 import Testimonials from "@/section/testimonials";
 import Skills from "@/section/skills";
 import Services from "@/section/services";
+import TransitionStrip from "@/section/transition-strip";
+import TransitionStripTwo from "@/section/transition-strip-two";
 import Contact from "@/section/contact";
 import Footer from "@/section/footer";
 import Image from "next/image";
@@ -15,7 +17,9 @@ export default function Home() {
       <main>
         <Hero/>
         <FeaturedProjects />
+        <TransitionStrip />
         <Services />
+        <TransitionStripTwo />
         <Testimonials />
         <Skills />
         <Contact />
