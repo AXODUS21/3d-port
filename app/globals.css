@@ -122,10 +122,14 @@
   html {
     scroll-behavior: smooth;
     overscroll-behavior-y: none;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   body {
     @apply bg-background text-foreground;
     overscroll-behavior-y: none;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   
   /* Enhanced scroll snap smoothness */
