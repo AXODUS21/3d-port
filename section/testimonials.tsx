@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Play, Pause, Maximize2, X, Volume2, VolumeX, Quote } from 'lucide-react'
+import React, { useRef, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Play, Pause, Maximize2, X, Volume2, VolumeX, Quote, ArrowLeft, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react'
 
 interface Testimonial {
   id: number
@@ -78,92 +77,63 @@ const testimonialsData: Testimonial[] = [
   }
 ]
 
-// Duplicate data for infinite loop
-const infiniteTestimonials = [...testimonialsData, ...testimonialsData, ...testimonialsData, ...testimonialsData]
-
 const Testimonials = () => {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const [playingVideo, setPlayingVideo] = useState<string | null>(null) // ID is now string (composite)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [playingVideo, setPlayingVideo] = useState<number | null>(null)
+  const [mutedVideos, setMutedVideos] = useState<Set<number>>(new Set())
   const [modalVideo, setModalVideo] = useState<Testimonial | null>(null)
-  const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set()) // Track muted state by unique composite ID
-  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map()) // Map uses composite ID
+  
+  const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map())
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % testimonialsData.length)
+    setPlayingVideo(null) // Stop playing when switching
+  }
 
-    const ctx = gsap.context(() => {
-        // Infinite scroll animation - Right to Left
-        // Use xPercent -50 to consistent with Skills section. 
-        // We have 4 sets. -50% moves past 2 sets. 
-        // This ensures smooth looping and correct direction.
-        
-        // Infinite scroll animation - Left to Right
-        // To move Right seamlessly, we start at -50% (shifted left, showing duplicate sets 3 & 4)
-        // and animate to 0 (start, showing sets 1 & 2).
-        // Since Set 1 and Set 3 are identical, the loop is invisible.
-        
-        gsap.fromTo(track, 
-          { 
-            xPercent: -50 
-          },
-          {
-            xPercent: 0, 
-            ease: "none",
-            duration: 80, 
-            repeat: -1,
-          }
-        )
-    }, sectionRef)
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + testimonialsData.length) % testimonialsData.length)
+    setPlayingVideo(null)
+  }
 
-    return () => ctx.revert()
-  }, [])
-
-  const getCompositeId = (id: number, index: number) => `${id}-${index}`
-
-  const togglePlay = (compositeId: string, e: React.MouseEvent) => {
+  const togglePlay = (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
-    const video = videoRefs.current.get(compositeId)
+    const video = videoRefs.current.get(id)
     if (!video) return
 
-    if (playingVideo === compositeId) {
+    if (playingVideo === id) {
       video.pause()
       setPlayingVideo(null)
     } else {
       // Pause all others
-      videoRefs.current.forEach((v, id) => {
-        if (id !== compositeId) {
-          v.pause()
-        }
+      videoRefs.current.forEach((v, vId) => {
+        if (vId !== id) v.pause()
       })
       video.play()
-      setPlayingVideo(compositeId)
+      setPlayingVideo(id)
     }
   }
 
-  const toggleMute = (compositeId: string, e: React.MouseEvent) => {
+  const toggleMute = (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
-    const video = videoRefs.current.get(compositeId)
+    const video = videoRefs.current.get(id)
     if (!video) return
 
     const newMuted = new Set(mutedVideos)
-    if (mutedVideos.has(compositeId)) {
-      newMuted.delete(compositeId)
+    if (mutedVideos.has(id)) {
+      newMuted.delete(id)
       video.muted = false
     } else {
-      newMuted.add(compositeId)
+      newMuted.add(id)
       video.muted = true
     }
     setMutedVideos(newMuted)
   }
 
-  const handleOpenModal = (testimonial: Testimonial, compositeId: string) => {
-     // Pause the instance video first
-     const video = videoRefs.current.get(compositeId)
+  const handleOpenModal = (testimonial: Testimonial) => {
+     const video = videoRefs.current.get(testimonial.id)
      if (video) video.pause()
      setPlayingVideo(null)
-     
      setModalVideo(testimonial)
   }
 
@@ -171,173 +141,222 @@ const Testimonials = () => {
     setModalVideo(null)
   }
 
-  const handleMouseEnter = () => {
-    gsap.getTweensOf(trackRef.current).forEach(t => t.pause())
-  }
-  
-  const handleMouseLeave = () => {
-    gsap.getTweensOf(trackRef.current).forEach(t => t.resume())
-  }
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (modalVideo) return // Don't navigate if modal is open
+        if (e.key === 'ArrowLeft') handlePrev()
+        if (e.key === 'ArrowRight') handleNext()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [modalVideo])
 
   return (
     <section 
-      ref={sectionRef} 
       id="testimonials" 
-      className="relative bg-zinc-950 py-32 overflow-hidden flex flex-col justify-center min-h-screen"
+      className="relative bg-zinc-950 py-20 md:py-32 overflow-hidden min-h-screen flex items-center"
     >
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-      {/* Section Header */}
-      <div className="container mx-auto px-8 md:px-16 mb-16 z-20 relative mix-blend-difference">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-12 h-px bg-white/50" />
-          <span className="text-sm font-mono text-white/50 tracking-[0.2em]">04 // TESTIMONIALS</span>
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Column: Navigation & Info */}
+            <div className="lg:col-span-4 flex flex-col justify-between h-full space-y-8 lg:space-y-12">
+               <div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-px bg-white/50" />
+                    <span className="text-sm font-mono text-white/50 tracking-[0.2em]">04 // TESTIMONIALS</span>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9]">
+                    Client<br/>Database
+                  </h2>
+               </div>
+
+               <div className="hidden lg:block">
+                  <p className="text-zinc-400 text-sm md:text-base max-w-sm leading-relaxed mb-8">
+                     Trusted by forward-thinking companies. We deliver high-performance digital solutions that drive real business growth.
+                  </p>
+                  
+                  {/* Status Indicator */}
+                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-500 uppercase tracking-widest border border-white/10 w-fit px-4 py-2 rounded-full bg-zinc-900/50 backdrop-blur-sm">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span>Viewing entry {String(currentIndex + 1).padStart(2, '0')} / {String(testimonialsData.length).padStart(2, '0')}</span>
+                  </div>
+               </div>
+
+               {/* Navigation Controls */}
+               <div className="flex items-center gap-4">
+                  <button 
+                      onClick={handlePrev}
+                      className="w-14 h-14 rounded-full border border-white/10 bg-zinc-900/50 hover:bg-white hover:text-black hover:border-white text-white flex items-center justify-center transition-all duration-300 group"
+                  >
+                      <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                  </button>
+                  <button 
+                      onClick={handleNext}
+                      className="w-14 h-14 rounded-full border border-white/10 bg-zinc-900/50 hover:bg-white hover:text-black hover:border-white text-white flex items-center justify-center transition-all duration-300 group"
+                  >
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+               </div>
+            </div>
+
+            {/* Right Column: Active Card Display */}
+            <div className="lg:col-span-8 relative">
+                 <div className="relative w-full aspect-4/5 md:aspect-video lg:aspect-video overflow-hidden rounded-sm border border-white/10 bg-zinc-900/20 backdrop-blur-xl">
+                      
+                      <AnimatePresence mode="wait">
+                          <motion.div
+                              key={currentIndex}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -20 }}
+                              transition={{ duration: 0.4, ease: "easeInOut" }}
+                              className="absolute inset-0 w-full h-full"
+                          >
+                               {testimonialsData[currentIndex].type === 'video' ? (
+                                   // VIDEO CARD
+                                   <div className="relative w-full h-full group">
+                                       <video
+                                           ref={(el) => {
+                                             if (el) videoRefs.current.set(testimonialsData[currentIndex].id, el)
+                                             else videoRefs.current.delete(testimonialsData[currentIndex].id)
+                                           }}
+                                           src={testimonialsData[currentIndex].videoUrl}
+                                           poster={testimonialsData[currentIndex].thumbnail}
+                                           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                                           loop
+                                           playsInline
+                                           muted={mutedVideos.has(testimonialsData[currentIndex].id)}
+                                           onClick={(e) => togglePlay(testimonialsData[currentIndex].id, e)}
+                                       />
+                                       
+                                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-80" />
+
+                                       {/* Center Play Button */}
+                                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <div className={`w-20 h-20 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md transition-all duration-300 ${playingVideo === testimonialsData[currentIndex].id ? 'scale-90 opacity-0' : 'scale-100 opacity-100 group-hover:scale-110'}`}>
+                                                <Play className="text-white fill-white ml-1" size={32} />
+                                            </div>
+                                       </div>
+
+                                       <div className="absolute top-6 right-6 flex gap-2 z-20">
+                                            <button 
+                                                onClick={(e) => toggleMute(testimonialsData[currentIndex].id, e)}
+                                                className="p-3 bg-black/50 hover:bg-white hover:text-black border border-white/10 text-white rounded-full backdrop-blur-md transition-colors"
+                                            >
+                                                {mutedVideos.has(testimonialsData[currentIndex].id) ? <VolumeX size={18} /> : <Volume2 size={18}/>}
+                                            </button>
+                                            <button 
+                                                onClick={() => handleOpenModal(testimonialsData[currentIndex])} 
+                                                className="p-3 bg-black/50 hover:bg-white hover:text-black border border-white/10 text-white rounded-full backdrop-blur-md transition-colors"
+                                            >
+                                                <Maximize2 size={18} />
+                                            </button>
+                                       </div>
+                                   </div>
+                               ) : (
+                                   // TEXT CARD
+                                   <div className="w-full h-full p-8 md:p-16 flex flex-col justify-center relative">
+                                       <Quote className="absolute top-8 left-8 md:top-12 md:left-12 text-zinc-800 w-16 h-16 md:w-24 md:h-24 opacity-50" strokeWidth={1} />
+                                       
+                                       <div className="relative z-10 max-w-3xl">
+                                            <p className="text-xl md:text-3xl lg:text-4xl text-zinc-100 font-light leading-snug tracking-tight">
+                                                "{testimonialsData[currentIndex].text}"
+                                            </p>
+                                       </div>
+                                       
+                                       <div className="absolute bottom-0 right-0 p-4 opacity-10">
+                                           <div className="text-[120px] md:text-[200px] font-black leading-none tracking-tighter text-white select-none">
+                                               {String(testimonialsData[currentIndex].id).padStart(2, '0')}
+                                           </div>
+                                       </div>
+                                   </div>
+                               )}
+
+                               {/* INFO BAR - ALWAYS VISIBLE */}
+                               <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-linear-to-t from-black to-transparent z-20 flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center border border-white/10 font-bold text-zinc-500">
+                                            {testimonialsData[currentIndex].author.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-mono uppercase tracking-widest text-sm md:text-base font-bold">
+                                                {testimonialsData[currentIndex].author}
+                                            </h3>
+                                            <p className="text-zinc-400 font-mono text-xs md:text-sm">
+                                                {testimonialsData[currentIndex].role} @ {testimonialsData[currentIndex].company}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="hidden md:block">
+                                        <div className="px-3 py-1 bg-white/10 border border-white/10 rounded text-[10px] font-mono text-white/70 uppercase tracking-widest">
+                                            {testimonialsData[currentIndex].type === 'video' ? 'Video Review' : 'Verified Quote'}
+                                        </div>
+                                    </div>
+                               </div>
+                          </motion.div>
+                      </AnimatePresence>
+                 </div>
+                 
+                 {/* Progress Line */}
+                 <div className="absolute -bottom-10 left-0 w-full flex items-center gap-2">
+                     {testimonialsData.map((_, idx) => (
+                         <button 
+                             key={idx}
+                             onClick={() => {
+                                 setPlayingVideo(null)
+                                 setCurrentIndex(idx)
+                             }}
+                             className={`h-1 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-24 bg-white' : 'w-full bg-zinc-800 hover:bg-zinc-700'}`}
+                         />
+                     ))}
+                 </div>
+            </div>
+
         </div>
-        <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
-          Client<br/>Database
-        </h2>
       </div>
 
-        {/* The Track */}
-        <div 
-          className="w-full overflow-hidden z-10"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div 
-            ref={trackRef}
-            className="flex gap-8 w-max px-4"
-            style={{ willChange: 'transform' }}
-          >
-             {infiniteTestimonials.map((item, index) => {
-               const compositeId = getCompositeId(item.id, index)
-               return (
-                 <div 
-                   key={compositeId}
-                   className="relative shrink-0 w-[85vw] md:w-[500px] h-[500px] md:h-[400px] bg-zinc-900/40 border border-white/10 backdrop-blur-sm group hover:border-white/30 transition-colors duration-500 flex flex-col"
-                 >
-                    {/* ID Tag */}
-                    <div className="absolute -top-3 left-4 bg-zinc-950 px-2 text-[10px] font-mono text-zinc-500 border border-zinc-800">
-                      {String(item.id).padStart(3, '0')}
-                    </div>
-    
-                    {/* Corner Accents */}
-                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30" />
-                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30" />
-    
-                    {item.type === 'video' ? (
-                      // Video Card Layout
-                      <div className="relative w-full h-full overflow-hidden">
-                        <video
-                          ref={(el) => {
-                             if (el) {
-                               videoRefs.current.set(compositeId, el)
-                               // Set initial muted state if needed (or default to keys)
-                             } else {
-                               videoRefs.current.delete(compositeId)
-                             }
-                          }}
-                          src={item.videoUrl}
-                          poster={item.thumbnail}
-                          className="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-                          loop
-                          playsInline
-                          onEnded={() => setPlayingVideo(null)}
-                          onClick={() => handleOpenModal(item, compositeId)}
-                        />
-                        
-                        {/* Overlay UI */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-90" />
-                        
-                        {/* Play Button Center */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                           <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md">
-                              {playingVideo === compositeId ? <Pause className="text-white fill-white" size={20} /> : <Play className="text-white fill-white" size={20} />}
-                           </div>
-                        </div>
-    
-                        {/* Controls */}
-                        <div className="absolute top-4 right-4 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                           <button onClick={(e) => togglePlay(compositeId, e)} className="p-2 hover:bg-white/10 rounded-full transition"><Play size={16} className="text-white" /></button>
-                           <button onClick={(e) => toggleMute(compositeId, e)} className="p-2 hover:bg-white/10 rounded-full transition">{mutedVideos.has(compositeId) ? <VolumeX size={16} className="text-white"/> : <Volume2 size={16} className="text-white"/>}</button>
-                           <button onClick={() => handleOpenModal(item, compositeId)} className="p-2 hover:bg-white/10 rounded-full transition"><Maximize2 size={16} className="text-white"/></button>
-                        </div>
-    
-                        {/* Bottom Info */}
-                        <div className="absolute bottom-0 left-0 w-full p-6 border-t border-white/10 bg-zinc-950/50 backdrop-blur-md">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-white font-mono uppercase tracking-wider text-sm">{item.author}</h3>
-                                    <p className="text-zinc-500 font-mono text-xs">{item.role} @ {item.company}</p>
-                                </div>
-                                <div className="text-xs font-mono text-zinc-600 bg-zinc-900 px-2 py-1 rounded">
-                                  VIDEO_LOG
-                                </div>
-                            </div>
-                        </div>
-                      </div>
-                    ) : (
-                       // Text Card Layout
-                       <div className="relative w-full h-full p-8 flex flex-col justify-between">
-                          <Quote className="text-zinc-700" size={48} />
-                          
-                          <div className="flex-1 flex items-center my-6">
-                            <p className="text-xl md:text-2xl text-zinc-300 font-light leading-relaxed">
-                              "{item.text}"
-                            </p>
-                          </div>
-    
-                          <div className="border-t border-zinc-800 pt-6 flex items-center gap-4">
-                             <div className="w-10 h-10 bg-zinc-800 flex items-center justify-center font-mono text-zinc-500 font-bold">
-                                {item.author.charAt(0)}
-                             </div>
-                             <div>
-                                <h3 className="text-white font-mono uppercase tracking-wider text-sm">{item.author}</h3>
-                                <p className="text-zinc-500 font-mono text-xs">{item.role} / {item.company}</p>
-                             </div>
-                          </div>
-                       </div>
-                    )}
-                 </div>
-               )
-             })}
-          </div>
-          
-          {/* Progress Bar (Decorative) */}
-          <div className="absolute bottom-0 left-0 w-full h-px bg-zinc-800">
-             <div className="h-full bg-white/20 w-[20%] animate-pulse" />
-          </div>
-  
-        </div>
-  
+      {/* Video Modal */}
+      <AnimatePresence>
         {modalVideo && (
-          <div 
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300"
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
             onClick={closeModal}
           >
             <button
               onClick={closeModal}
-              className="absolute top-8 right-8 p-4 hover:bg-white/10 rounded-full transition-colors group"
+              className="absolute top-8 right-8 p-4 hover:bg-white/10 rounded-full transition-colors group z-50"
             >
               <X className="w-8 h-8 text-zinc-500 group-hover:text-white transition-colors" />
             </button>
   
-            <div className="relative w-full max-w-6xl aspect-video border border-zinc-800 bg-zinc-900" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full max-w-6xl aspect-video border border-zinc-800 bg-zinc-900 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <video
                 className="w-full h-full"
                 controls
                 autoPlay
                 src={modalVideo.videoUrl}
               />
-               <div className="absolute top-0 left-0 px-4 py-2 bg-black border-r border-b border-zinc-800 text-xs font-mono text-zinc-500">
-                 PLAYBACK_MODE // {modalVideo.id.toString().padStart(3, '0')}
+               <div className="absolute top-0 left-0 px-4 py-2 bg-black border-r border-b border-zinc-800 text-xs font-mono text-zinc-500 flex items-center gap-2">
+                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                 PLAYBACK_MODE // {String(modalVideo.id).padStart(3, '0')}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
     </section>
   )
 }
 
 export default Testimonials
+
