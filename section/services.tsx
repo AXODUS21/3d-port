@@ -12,28 +12,32 @@ const services = [
     menuTitle: "Brand Design",
     title: "Brand identity\n& structure",
     description: "We build distinct brand identities that resonate with your audience. From logo design to comprehensive style guides, we ensure your brand communicates its value clearly and consistently across all touchpoints.",
-    bgClass: "bg-zinc-900" 
+    bgClass: "bg-zinc-900",
+    image: "/services/brand.jpg"
   },
   {
     id: "02",
     menuTitle: "UI/UX Design",
     title: "User Interface\n& Experience",
     description: "Designing intuitive and aesthetically pleasing user interfaces that drive engagement. We prioritize user journey and accessibility above all to create seamless digital experiences.",
-    bgClass: "bg-zinc-800"
+    bgClass: "bg-zinc-800",
+    image: "/services/ui.jpg"
   },
   {
     id: "03",
     menuTitle: "Web Development",
     title: "Front-end/\nCMS development",
     description: "We implement optimized code without compromising beautiful design. We provide immersive experiences with 3D and animations while achieving high Core Web Vitals scores. We offer sustainable front-end development that balances customer satisfaction and SEO.",
-    bgClass: "bg-neutral-900"
+    bgClass: "bg-neutral-900",
+    image: "/services/webdev.jpg"
   },
   {
     id: "04",
     menuTitle: "3D & Motion",
     title: "3D animation and\nmotion graphics",
     description: "We create immersive worldviews using advanced technologies such as WebGL, AR, and Infographics. We enhance brand experiences through stunning creative content. We offer consistent support from planning to production enabling us to deliver results that directly connect to your business goals.",
-    bgClass: "bg-stone-900"
+    bgClass: "bg-stone-900",
+    image: "/services/3d.jpg"
   }
 ]
 
@@ -45,8 +49,19 @@ const Services = () => {
   // Motion value to track scroll progress (0 to 1)
   const scrollYProgress = useMotionValue(0)
   
-  // Transform scroll progress to vertical translation (0% to -300%)
+  // Transform scroll progress to vertical translation for text (0% to -300%)
   const y = useTransform(scrollYProgress, [0, 1], ["0%", `-${(services.length - 1) * 100}%`])
+  
+  // Create individual background transforms for stacking effect
+  // Each subsequent image slides down (-100% -> 0%) over the previous one
+  const bgTransforms = services.map((_, i) => {
+    // First image stays fixed
+    if (i === 0) return useTransform(scrollYProgress, [0, 1], ["0%", "0%"])
+    
+    const start = (i - 1) / (services.length - 1)
+    const end = i / (services.length - 1)
+    return useTransform(scrollYProgress, [start, end], ["-100%", "0%"])
+  })
 
   useEffect(() => {
     // Shared scroll handler
@@ -96,25 +111,25 @@ const Services = () => {
       
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col">
         
-        {/* Background Layer - retained snap/fade effect */}
-        <div className="absolute inset-0 -z-10">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={activeIndex}
-              className={`absolute inset-0 ${services[activeIndex].bgClass}`}
-              initial={{ y: "100%" }}
-              animate={{ y: "0%" }}
-              exit={{ y: "-100%" }}
-              transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }} 
-            >
-                 <div className="absolute inset-0 opacity-20" 
-                      style={{ 
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
-                      }} 
-                 />
-                 <div className={`absolute inset-0 bg-linear-to-t from-black/80 to-transparent`} />
-            </motion.div>
-          </AnimatePresence>
+        {/* Background Layer - Stacking Parallax */}
+        <div className="absolute inset-0 -z-10 bg-black overflow-hidden">
+            {services.map((service, i) => (
+                <motion.div 
+                    key={service.id}
+                    className="absolute inset-0 w-full h-full"
+                    style={{ y: bgTransforms[i], zIndex: i }}
+                >
+                     <img 
+                        src={service.image}
+                        alt={service.menuTitle}
+                        className="w-full h-full object-cover blur-sm scale-105 opacity-80"
+                     />
+                </motion.div>
+            ))}
+            
+            {/* Static Overlays - Always on top of images */}
+            <div className="absolute inset-0 bg-black/40 z-10" />
+            <div className={`absolute inset-0 bg-linear-to-t from-black/80 to-transparent z-10`} />
         </div>
 
         {/* Content Layer */}
@@ -169,7 +184,7 @@ const Services = () => {
             {/* Center/Right Column: Active Card */}
             <div className="lg:col-span-8 flex justify-center lg:justify-start items-center h-full">
                 
-                <div className="relative bg-white text-black w-full max-w-md aspect-3/4 md:aspect-4/5 lg:aspect-3/4 lg:max-h-[600px] shadow-2xl overflow-hidden flex flex-col">
+                <div className="relative bg-white text-black w-full max-w-sm aspect-3/4 md:aspect-4/5 lg:aspect-3/4 lg:max-h-[500px] shadow-2xl overflow-hidden flex flex-col">
                     
                     {/* Floating Content Container */}
                     <div className="flex-1 relative overflow-hidden">
