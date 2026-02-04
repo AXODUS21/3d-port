@@ -1,21 +1,31 @@
 'use client'
 
-import { use } from 'react'
+import { use, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react'
 import TransitionLink from '@/components/transition-link'
+import { useLenis } from '@/components/smooth-scroll'
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const lenis = useLenis()
   
   // Unwrap the params Promise using React.use()
   const { id } = use(params)
+
+  useEffect(() => {
+    // Force scroll to top on mount, handling both native browser restoration and Lenis state
+    window.scrollTo(0, 0)
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true })
+    }
+  }, [lenis])
   
   // Sample project data - in a real app, you'd fetch this based on the ID
   const projects: Record<string, any> = {
     '1': {
-      title: "NEON VERTEX",
-      category: "Interactive 3D Experience",
+      title: "Velocity",
+      category: "Web Development",
       year: "2025",
       description: "A revolutionary web graphics engine capable of rendering millions of particles in real-time. Designed for next-generation data visualization and immersive storytelling.",
       fullDescription: "NEON VERTEX represents a breakthrough in web-based 3D rendering technology. Built from the ground up with performance in mind, it leverages WebGL 2.0 and custom shader pipelines to achieve unprecedented particle counts and frame rates. The engine includes a sophisticated LOD system, spatial partitioning, and GPU-accelerated physics simulation.",
@@ -25,8 +35,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       results: ["10M+ particles at 60fps", "50% reduction in memory usage", "Cross-platform compatibility"],
     },
     '2': {
-      title: "AETHER FINANCE",
-      category: "DeFi Dashboard",
+      title: "Kill The Pitch",
+      category: "Tutoring Platform",
       year: "2025",
       description: "Institutional-grade diversified portfolio management with real-time analytics and prediction markets.",
       fullDescription: "AETHER FINANCE is a comprehensive DeFi platform built on Solana, offering institutional investors a sophisticated suite of tools for portfolio management, risk analysis, and automated trading strategies. The platform processes thousands of transactions per second with sub-millisecond latency.",
@@ -36,8 +46,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       results: ["$50M+ in managed assets", "99.99% uptime", "Sub-100ms update latency"],
     },
     '3': {
-      title: "SYNTH OS",
-      category: "Web Operating System",
+      title: "SBTLC",
+      category: "Tutoring Platform",
       year: "2024",
       description: "A fully functional cloud operating system that lives in the browser.",
       fullDescription: "SYNTH OS reimagines what's possible in the browser by creating a complete operating system experience. It features a virtual file system, process management, window manager, and a suite of native applications all running entirely in the browser using WebAssembly.",
@@ -47,8 +57,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       results: ["100K+ active users", "50+ integrated apps", "Featured on HackerNews"],
     },
     '4': {
-      title: "VOID RUNNER",
-      category: "Browser Game",
+      title: "Spooftify",
+      category: "Music Streaming Platform",
       year: "2024",
       description: "Cyberpunk infinite runner featuring procedural generation and reactive audio synthesis.",
       fullDescription: "VOID RUNNER is an infinite runner game that pushes the boundaries of what's achievable with vanilla JavaScript and the Canvas API. The game features procedurally generated levels, reactive audio that responds to gameplay, and a custom physics engine—all without external game engines.",
@@ -56,6 +66,17 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Achieving console-quality performance and audio in a browser game without using established game engines.",
       solution: "Implemented a custom rendering pipeline with object pooling, developed a procedural generation system with seed-based reproducibility, and created a reactive audio engine using Web Audio API.",
       results: ["500K+ plays", "4.8/5 rating", "Featured on gaming blogs"],
+    },
+    '5': {
+      title: "Email Superstars",
+      category: "Email Marketing Platform",
+      year: "2024",
+      description: "Email marketing platform that allows users to create and send personalized emails to their customers.",
+      fullDescription: "Email Superstars is a comprehensive email marketing platform built on Next.js, offering users a sophisticated suite of tools for email marketing, risk analysis, and automated trading strategies. The platform processes thousands of transactions per second with sub-millisecond latency.",
+      tags: ["Next.js", "TypeScript", "React"],
+      challenge: "Building a real-time financial dashboard that could handle high-frequency updates while maintaining data accuracy.",
+      solution: "Developed a custom WebSocket infrastructure with optimistic updates and conflict resolution, backed by Solana's high-throughput blockchain.",
+      results: ["$50M+ in managed assets", "99.99% uptime", "Sub-100ms update latency"],
     },
   }
 

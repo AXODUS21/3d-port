@@ -37,7 +37,20 @@ export default function TransitionOverlay() {
       // 1. If we shouldn't wait for content (e.g. same page), end immediately.
       // 2. If we SHOULD wait, check if the pathname has changed.
       if (!shouldWaitForContent || pathname !== prevPathname.current) {
-        endTransition()
+        
+        // Check if there is a pending hash scroll operation
+        const hasPendingHash = typeof window !== 'undefined' && sessionStorage.getItem('pendingHashScroll')
+        
+        if (hasPendingHash) {
+             // If scrolling to a hash, keep the overlay up longer to hide the jump
+             // HashScrollHandler waits ~1000ms to scroll, so we wait 1200ms
+             const timer = setTimeout(() => {
+                 endTransition()
+             }, 1200)
+             return () => clearTimeout(timer)
+        } else {
+             endTransition()
+        }
       }
     }
   }, [isTransitioning, isMinDurationDone, shouldWaitForContent, pathname, prevPathname, endTransition])
