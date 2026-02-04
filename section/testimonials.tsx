@@ -19,11 +19,10 @@ const testimonialsData: Testimonial[] = [
   {
     id: 1,
     type: 'video',
-    videoUrl: '/testimonials/video1.mp4',
-    thumbnail: '/testimonials/thumb1.jpg',
-    author: "Sarah Jenning",
-    role: "Product Director",
-    company: "Vertex Labs"
+    videoUrl: '/testimonials/Oscar Testimonial.mp4',
+    author: "Oscar",
+    role: "Founder",
+    company: "ScaleSet"
   },
   {
     id: 2,
@@ -36,9 +35,8 @@ const testimonialsData: Testimonial[] = [
   {
     id: 3,
     type: 'video',
-    videoUrl: '/testimonials/video2.mp4',
-    thumbnail: '/testimonials/thumb2.jpg',
-    author: "Elena Rodriguez",
+    videoUrl: '/testimonials/sam video testimonial.mp4',
+    author: "Sam",
     role: "Founder",
     company: "Prism Digital"
   },
@@ -80,7 +78,7 @@ const testimonialsData: Testimonial[] = [
 const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [playingVideo, setPlayingVideo] = useState<number | null>(null)
-  const [mutedVideos, setMutedVideos] = useState<Set<number>>(new Set())
+  const [unmutedVideos, setUnmutedVideos] = useState<Set<number>>(new Set())
   const [modalVideo, setModalVideo] = useState<Testimonial | null>(null)
   
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map())
@@ -119,15 +117,15 @@ const Testimonials = () => {
     const video = videoRefs.current.get(id)
     if (!video) return
 
-    const newMuted = new Set(mutedVideos)
-    if (mutedVideos.has(id)) {
-      newMuted.delete(id)
-      video.muted = false
-    } else {
-      newMuted.add(id)
+    const newUnmuted = new Set(unmutedVideos)
+    if (unmutedVideos.has(id)) {
+      newUnmuted.delete(id)
       video.muted = true
+    } else {
+      newUnmuted.add(id)
+      video.muted = false
     }
-    setMutedVideos(newMuted)
+    setUnmutedVideos(newUnmuted)
   }
 
   const handleOpenModal = (testimonial: Testimonial) => {
@@ -139,6 +137,79 @@ const Testimonials = () => {
 
   const closeModal = () => {
     setModalVideo(null)
+  }
+
+  const [progress, setProgress] = useState(0)
+
+  /* Autoplay Logic */
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Section is in view
+            const currentItem = testimonialsData[currentIndex]
+            if (currentItem.type === 'video') {
+               const video = videoRefs.current.get(currentItem.id)
+               if (video) {
+                 video.play().catch(() => {}) // Auto-play might be blocked by browser policies
+                 setPlayingVideo(currentItem.id)
+               }
+            }
+          } else {
+            // Section left view - pause everything
+             setPlayingVideo(null)
+             videoRefs.current.forEach(v => v.pause())
+          }
+        })
+      },
+      { threshold: 0.5 } // Trigger when 50% visible
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [currentIndex]) // Re-run when index changes to play the new video if visible
+
+  /* Auto-advance Timer (Progress Bar) */
+  useEffect(() => {
+    setProgress(0)
+    const currentItem = testimonialsData[currentIndex]
+    let interval: NodeJS.Timeout
+
+    if (currentItem.type === 'text') {
+      const startTime = Date.now()
+      const duration = 10000 // 10 seconds
+
+      interval = setInterval(() => {
+        const elapsed = Date.now() - startTime
+        const newProgress = (elapsed / duration) * 100
+        
+        if (newProgress >= 100) {
+          setProgress(100)
+          clearInterval(interval)
+          handleNext()
+        } else {
+          setProgress(newProgress)
+        }
+      }, 50)
+    }
+
+    return () => clearInterval(interval)
+  }, [currentIndex])
+
+  const handleVideoEnded = () => {
+    setPlayingVideo(null)
+    handleNext()
+  }
+
+  const handleVideoProgress = (e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const video = e.currentTarget
+    if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100)
+    }
   }
 
   // Keyboard navigation
@@ -154,6 +225,7 @@ const Testimonials = () => {
 
   return (
     <section 
+      ref={containerRef}
       id="testimonials" 
       className="relative bg-zinc-950 py-20 md:py-32 overflow-hidden min-h-screen flex items-center"
     >
@@ -229,13 +301,15 @@ const Testimonials = () => {
                                            src={testimonialsData[currentIndex].videoUrl}
                                            poster={testimonialsData[currentIndex].thumbnail}
                                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                                           loop
+                                           // loop // Removed loop to allow auto-advance on end
                                            playsInline
-                                           muted={mutedVideos.has(testimonialsData[currentIndex].id)}
+                                           onEnded={handleVideoEnded}
+                                           onTimeUpdate={handleVideoProgress}
+                                           muted={!unmutedVideos.has(testimonialsData[currentIndex].id)}
                                            onClick={(e) => togglePlay(testimonialsData[currentIndex].id, e)}
                                        />
                                        
-                                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-80" />
+                                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-80 pointer-events-none" />
 
                                        {/* Center Play Button */}
                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -249,7 +323,7 @@ const Testimonials = () => {
                                                 onClick={(e) => toggleMute(testimonialsData[currentIndex].id, e)}
                                                 className="p-3 bg-black/50 hover:bg-white hover:text-black border border-white/10 text-white rounded-full backdrop-blur-md transition-colors"
                                             >
-                                                {mutedVideos.has(testimonialsData[currentIndex].id) ? <VolumeX size={18} /> : <Volume2 size={18}/>}
+                                                {!unmutedVideos.has(testimonialsData[currentIndex].id) ? <VolumeX size={18} /> : <Volume2 size={18}/>}
                                             </button>
                                             <button 
                                                 onClick={() => handleOpenModal(testimonialsData[currentIndex])} 
@@ -313,8 +387,15 @@ const Testimonials = () => {
                                  setPlayingVideo(null)
                                  setCurrentIndex(idx)
                              }}
-                             className={`h-1 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-24 bg-white' : 'w-full bg-zinc-800 hover:bg-zinc-700'}`}
-                         />
+                             className={`h-1 flex-1 rounded-full transition-all duration-300 relative overflow-hidden bg-zinc-800 hover:bg-zinc-700`}
+                         >
+                            {idx === currentIndex && (
+                                <div 
+                                    className="absolute inset-0 bg-white h-full transition-all duration-100 ease-linear"
+                                    style={{ width: `${progress}%` }}
+                                />
+                            )}
+                         </button>
                      ))}
                  </div>
             </div>
