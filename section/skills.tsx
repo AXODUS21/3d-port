@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Terminal, Database, PenTool, Cloud } from 'lucide-react'
+import { Terminal, Database, PenTool, Cloud, Settings } from 'lucide-react'
 
 interface SkillCategory {
   id: string
@@ -20,7 +20,7 @@ const skillsData: SkillCategory[] = [
     category: "Frontend Engineering",
     icon: Terminal,
     description: "Architecting immersive, reactive interfaces.",
-    technologies: ["React", "Next.js", "TypeScript", "TailwindCSS", "Framer Motion", "Three.js"],
+    technologies: ["React", "Next.js", "TypeScript", "TailwindCSS", "Framer Motion", "Three.js", "GSAP"],
     color: "bg-blue-500",
     codeSnippet: `const Interface = () => {
   return (
@@ -36,7 +36,7 @@ const skillsData: SkillCategory[] = [
     category: "Backend Systems",
     icon: Database,
     description: "Designing scalable, fault-tolerant infrastructure.",
-    technologies: ["Node.js", "PostgreSQL", "Supabase", "GraphQL", "Redis", "Edge Functions"],
+    technologies: ["Node.js", "PostgreSQL", "Supabase", "REST API","MongoDB", "Firebase", "Express  "],
     color: "bg-emerald-500",
     codeSnippet: `async function query() {
   const data = await db
@@ -51,7 +51,7 @@ const skillsData: SkillCategory[] = [
     category: "Creative Design",
     icon: PenTool,
     description: "Bridging the gap between code and aesthetics.",
-    technologies: ["Figma", "Blender", "Adobe CC", "UI/UX", "Motion Design", "WebGL"],
+    technologies: ["Figma", "Blender", "UI/UX", "WebGL"],
     color: "bg-purple-500",
     codeSnippet: `.beauty {
   display: flex;
@@ -62,18 +62,18 @@ const skillsData: SkillCategory[] = [
   },
   {
     id: "04",
-    category: "DevOps & Cloud",
-    icon: Cloud,
-    description: "Orchestrating automated deployment pipelines.",
-    technologies: ["Docker", "AWS", "Vercel", "CI/CD", "Kubernetes", "Turborepo"],
+    category: "Tools & Platforms",
+    icon: Settings,
+    description: "Streamlining development workflows with modern tooling.",
+    technologies: ["Git", "Github", "Vercel", "Netlify"],
     color: "bg-orange-500",
-    codeSnippet: `version: '3.8'
-services:
-  app:
-    build: .
-    deploy:
-      replicas: 999
-      restart: always`
+    codeSnippet: `{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "eslint ."
+  }
+}`
   }
 ]
 
