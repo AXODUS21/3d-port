@@ -1,3 +1,5 @@
+import { Linkedin, Instagram, Calendar } from 'lucide-react'
+
 const Contact = () => {
   return (
     <section id="contact" className="min-h-screen py-32 px-8 flex flex-col items-center justify-center bg-zinc-950 text-white relative border-t border-zinc-900">
@@ -12,7 +14,7 @@ const Contact = () => {
                     [ START_COMMUNICATION ]
                 </p>
                 <p className="text-zinc-400 text-lg">
-                    hello@axellerosh.dev
+                    Always open for a conversation
                 </p>
             </div>
          </div>
@@ -46,8 +48,23 @@ const Contact = () => {
             ></textarea>
           </div>
           
-          <div className="flex justify-end mt-8">
-            <button className="px-12 py-4 bg-white text-black text-sm font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-all cursor-pointer">
+          <div className="flex flex-col-reverse md:flex-row items-center justify-between mt-12 gap-8">
+            <div className="flex gap-8">
+                <a href="https://www.linkedin.com/in/axellerosh-lubi/" target='_blank' className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+                    <Linkedin className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                    <span className="font-mono text-xs hidden md:block tracking-wider">LINKEDIN</span>
+                </a>
+                <a href="https://www.instagram.com/axellerosh?igsh=amZud2VlOTgyaGVt&utm_source=qr" target='_blank' className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+                    <Instagram className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                    <span className="font-mono text-xs hidden md:block tracking-wider">INSTAGRAM</span>
+                </a>
+                <a href="https://calendly.com/lubi-axellerosh/30min" target='_blank' className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+                    <Calendar className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                    <span className="font-mono text-xs hidden md:block tracking-wider">CALENDLY</span>
+                </a>
+            </div>
+
+            <button className="px-12 py-4 bg-white text-black text-sm font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-all cursor-pointer w-full md:w-auto">
                 Send Transmission
             </button>
           </div>
