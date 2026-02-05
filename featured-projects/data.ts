@@ -7,7 +7,9 @@ export const featuredProjects = [
     tags: ["WebGL", "Three.js", "React Fiber"],
     year: "2025",
     image: "/projects/Velocity.png",
-    bgColor: "from-purple-900/40 to-blue-900/40"
+    bgColor: "from-purple-900/40 to-blue-900/40",
+    borderColor: "border-teal-400",
+    accentColor: "bg-teal-500/10"
   },
   {
     id: 2,
@@ -17,7 +19,9 @@ export const featuredProjects = [
     tags: ["Solana", "Rust", "Next.js"],
     year: "2025",
     image: "/projects/KTP.png",
-    bgColor: "from-emerald-900/40 to-teal-900/40"
+    bgColor: "from-emerald-900/40 to-teal-900/40",
+    borderColor: "border-red-600",
+    accentColor: "bg-red-600/10"
   },
   {
     id: 3,
@@ -27,7 +31,9 @@ export const featuredProjects = [
     tags: ["TypeScript", "WASM", "System Desing"],
     year: "2024",
     image: "/projects/SBTLC.png",
-    bgColor: "from-orange-900/40 to-red-900/40"
+    bgColor: "from-orange-900/40 to-red-900/40",
+    borderColor: "border-blue-500",
+    accentColor: "bg-blue-500/10"
   },
   {
     id: 4,
@@ -37,7 +43,9 @@ export const featuredProjects = [
     tags: ["Canvas API", "WebAudio", "Procedural"],
     year: "2024",
     image: "/projects/Spooftify.png",
-    bgColor: "from-cyan-900/40 to-indigo-900/40"
+    bgColor: "from-cyan-900/40 to-indigo-900/40",
+    borderColor: "border-green-500",
+    accentColor: "bg-green-500/10"
   },
   {
     id: 5,
@@ -47,6 +55,8 @@ export const featuredProjects = [
     tags: ["AI", "Analytics", "Automation"],
     year: "2024",
     image: "/projects/Emailsuperstars.png",
-    bgColor: "from-pink-900/40 to-rose-900/40"
+    bgColor: "from-pink-900/40 to-rose-900/40",
+    borderColor: "border-amber-500",
+    accentColor: "bg-amber-500/10"
   }
 ];
