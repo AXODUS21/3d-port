@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { useLenis } from '@/components/smooth-scroll'
 import TransitionLink from '@/components/transition-link'
 
 const services = [
@@ -43,203 +42,131 @@ const services = [
 
 const Services = () => {
   const [activeIndex, setActiveIndex] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const lenis = useLenis()
-  
-  // Motion value to track scroll progress (0 to 1)
-  const scrollYProgress = useMotionValue(0)
-  
-  // Transform scroll progress to vertical translation for text (0% to -300%)
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", `-${(services.length - 1) * 100}%`])
-  
-  // Create individual background transforms for stacking effect
-  // Each subsequent image slides down (-100% -> 0%) over the previous one
-  const bgTransforms = services.map((_, i) => {
-    // First image stays fixed
-    if (i === 0) return useTransform(scrollYProgress, [0, 1], ["0%", "0%"])
-    
-    const start = (i - 1) / (services.length - 1)
-    const end = i / (services.length - 1)
-    return useTransform(scrollYProgress, [start, end], ["-100%", "0%"])
-  })
-
-  useEffect(() => {
-    // Shared scroll handler
-    const updateScroll = () => {
-        if (!containerRef.current) return
-
-        const { top, height } = containerRef.current.getBoundingClientRect()
-        const windowHeight = window.innerHeight
-        
-        const scrollDistance = -top
-        const sectionHeight = height - windowHeight
-
-        // Calculate continuous progress
-        const progress = Math.max(0, Math.min(1, scrollDistance / sectionHeight))
-        
-        // Update framer motion value directly for smooth animation
-        scrollYProgress.set(progress)
-
-        // Calculate discrete index for background/nav
-        const rawIndex = Math.floor(progress * services.length)
-        const clampedIndex = Math.max(0, Math.min(services.length - 1, rawIndex))
-        
-        setActiveIndex(clampedIndex)
-    }
-
-    if (lenis) {
-       lenis.on('scroll', updateScroll)
-       updateScroll() // Initial check
-       return () => {
-           lenis.off('scroll', updateScroll)
-       }
-    } else {
-       window.addEventListener('scroll', updateScroll)
-       updateScroll()
-       return () => window.removeEventListener('scroll', updateScroll)
-    }
-  }, [lenis, scrollYProgress])
 
   return (
     <section 
-      ref={containerRef} 
       id="services" 
-      className="relative bg-black"
-      // Height allows for scrolling through all items
-      style={{ height: `${services.length * 100 + 50}vh` }} 
+      className="relative bg-black py-20 md:py-32"
     >
-      
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col">
-        
-        {/* Background Layer - Stacking Parallax */}
-        <div className="absolute inset-0 -z-10 bg-black overflow-hidden">
-            {services.map((service, i) => (
-                <motion.div 
-                    key={service.id}
-                    className="absolute inset-0 w-full h-full"
-                    style={{ y: bgTransforms[i], zIndex: i }}
-                >
-                     <img 
-                        src={service.image}
-                        alt={service.menuTitle}
-                        className="w-full h-full object-cover blur-sm scale-105 opacity-80"
-                     />
-                </motion.div>
-            ))}
-            
-            {/* Static Overlays - Always on top of images */}
-            <div className="absolute inset-0 bg-black/40 z-10" />
-            <div className={`absolute inset-0 bg-linear-to-t from-black/80 to-transparent z-10`} />
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+        {/* Header */}
+        <div className="mb-16 md:mb-20">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+            <span className="text-white font-mono tracking-[0.2em] text-sm uppercase">Service</span>
+          </div>
+          <h2 className="text-5xl md:text-7xl font-bold font-mono text-white tracking-widest">
+            service
+          </h2>
         </div>
 
-        {/* Content Layer */}
-        <div className="relative z-10 w-full h-full p-4 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-[1920px] mx-auto">
-            
-            {/* Left Column: Title & Logic */}
-            <div className="lg:col-span-4 h-full flex flex-col justify-between py-12 lg:py-8 pl-4 lg:pl-0">
-                
-                {/* Section Title */}
-                <div>
-                     <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                        <span className="text-white font-mono tracking-[0.2em] text-sm uppercase">Service</span>
-                     </div>
-                     <h2 className="text-5xl md:text-7xl font-bold font-mono text-white tracking-widest mt-4">
-                        service
-                     </h2>
-                </div>
-
-                {/* Navigation List */}
-                <div className="hidden lg:flex flex-col gap-6 mt-auto">
-                    {services.map((service, index) => {
-                        const isActive = activeIndex === index
-                        return (
-                            <motion.div 
-                                key={service.id}
-                                className="flex items-center gap-4 cursor-pointer group"
-                                initial={false}
-                                animate={{ opacity: isActive ? 1 : 0.5, x: isActive ? 10 : 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <div className="w-2 relative flex items-center justify-center">
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="activeServiceDot"
-                                            className="w-2 h-2 bg-white rounded-full absolute"
-                                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                                        />
-                                    )}
-                                    <div className="w-1 h-1 bg-white/20 rounded-full" />
-                                </div>
-                                
-                                <span className={`text-xs font-mono tracking-widest uppercase transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white/80'}`}>
-                                    {service.menuTitle}
-                                </span>
-                            </motion.div>
-                        )
-                    })}
-                </div>
-            </div>
-
-            {/* Center/Right Column: Active Card */}
-            <div className="lg:col-span-8 flex justify-center lg:justify-start items-center h-full">
-                
-                <div className="relative bg-white text-black w-full max-w-sm aspect-3/4 md:aspect-4/5 lg:aspect-3/4 lg:max-h-[500px] shadow-2xl overflow-hidden flex flex-col">
-                    
-                    {/* Floating Content Container */}
-                    <div className="flex-1 relative overflow-hidden">
-                        
-                        {/* The scrolling stack */}
-                        <motion.div 
-                            className="absolute top-0 left-0 w-full h-full"
-                            style={{ y }} 
-                        >
-                            {services.map((service) => (
-                                <div 
-                                    key={service.id}
-                                    className="w-full h-full p-8 md:p-12 flex flex-col justify-start pt-16" // pt-16 to give space from top
-                                >
-                                     {/* Category */}
-                                    <div className="flex items-center gap-2 mb-6 shrink-0">
-                                        <div className="w-1.5 h-1.5 bg-black rounded-full" />
-                                        <span className="text-[10px] md:text-xs font-mono tracking-[0.2em] uppercase opacity-70">
-                                            {service.menuTitle}
-                                        </span>
-                                    </div>
-                                    
-                                    {/* Main Title */}
-                                    <h3 className="text-3xl md:text-4xl font-bold tracking-tighter leading-tight whitespace-pre-line mb-6 shrink-0">
-                                        {service.title}
-                                    </h3>
-
-                                     {/* Description */}
-                                    <p className="text-sm md:text-base leading-relaxed text-zinc-600 font-normal text-justify">
-                                        {service.description}
-                                    </p>
-                                </div>
-                            ))}
-                        </motion.div>
-                        
-                    </div>
-
-                    {/* Bottom Action Button - Static */}
-                    <div className="p-8 pt-0 flex justify-end relative z-10 bg-white/0"> 
-                       <TransitionLink 
-                            href={`/service/${services[activeIndex].id}`}
-                            className="bg-black text-white p-4 hover:bg-zinc-800 transition-colors duration-300 z-20 cursor-pointer inline-flex items-center justify-center"
-                       >
-                            <ArrowRight className="w-5 h-5" />
-                        </TransitionLink>
-                    </div>
-
-                </div>
-
-            </div>
-
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          {services.map((service, index) => (
+            <ServiceCard 
+              key={service.id} 
+              service={service} 
+              index={index}
+              isActive={activeIndex === index}
+              onHover={() => setActiveIndex(index)}
+            />
+          ))}
         </div>
-
       </div>
     </section>
+  )
+}
+
+interface ServiceCardProps {
+  service: typeof services[0];
+  index: number;
+  isActive: boolean;
+  onHover: () => void;
+}
+
+function ServiceCard({ service, index, isActive, onHover }: ServiceCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      onMouseEnter={onHover}
+      className="group relative aspect-[4/5] overflow-hidden cursor-pointer"
+    >
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <motion.div
+          animate={{ scale: isActive ? 1.05 : 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full h-full"
+        >
+          <img 
+            src={service.image}
+            alt={service.menuTitle}
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="relative h-full flex flex-col justify-between p-8 md:p-10">
+        {/* Top: Number & Category */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-white rounded-full" />
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/70">
+              {service.menuTitle}
+            </span>
+          </div>
+          <span className="text-xs font-mono text-white/50 tabular-nums">
+            {service.id}
+          </span>
+        </div>
+
+        {/* Middle: Title */}
+        <div>
+          <h3 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight whitespace-pre-line text-white mb-4">
+            {service.title}
+          </h3>
+          
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ 
+              opacity: isActive ? 1 : 0, 
+              height: isActive ? "auto" : 0 
+            }}
+            transition={{ duration: 0.3 }}
+            className="text-sm leading-relaxed text-zinc-300 overflow-hidden"
+          >
+            {service.description}
+          </motion.p>
+        </div>
+
+        {/* Bottom: Action Button */}
+        <div className="flex justify-end">
+          <TransitionLink 
+            href={`/service/${service.id}`}
+            className="w-12 h-12 bg-white text-black hover:bg-zinc-200 transition-colors flex items-center justify-center group/btn"
+          >
+            <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+          </TransitionLink>
+        </div>
+      </div>
+
+      {/* Border on hover */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isActive ? 1 : 0 }}
+        className="absolute inset-0 border-2 border-white/20 pointer-events-none"
+      />
+    </motion.div>
   )
 }
 

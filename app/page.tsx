@@ -1,5 +1,5 @@
 import Hero from "@/section/hero";
-import FeaturedProjects from "@/section/featured-projects";
+import { FeaturedProjects } from "@/featured-projects";
 import Testimonials from "@/section/testimonials";
 import Skills from "@/section/skills";
 import Services from "@/section/services";

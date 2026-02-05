@@ -25,14 +25,17 @@ export const SmoothScroll = ({ children }: { children?: React.ReactNode }) => {
 
     setLenis(lenisInstance)
 
+    let reqId: number; // Store the animation frame ID
+
     function raf(time: number) {
       lenisInstance.raf(time)
-      requestAnimationFrame(raf)
+      reqId = requestAnimationFrame(raf) // Capture the ID
     }
 
-    requestAnimationFrame(raf)
+    reqId = requestAnimationFrame(raf) // Capture the initial ID
 
     return () => {
+       cancelAnimationFrame(reqId) // STOP the loop!
        lenisInstance.destroy()
        setLenis(null)
     }
