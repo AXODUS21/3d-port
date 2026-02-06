@@ -26,6 +26,9 @@ gsap.registerPlugin(ScrollTrigger)
 // - mouseInfluence.x: Horizontal mouse movement effect (higher = more rotation)
 // - mouseInfluence.y: Vertical mouse movement effect (higher = more rotation)
 // - mouseInfluence.smoothing: How smooth the rotation (0.1 = smooth, 1 = instant)
+// - scenePosition.x: How far left/right the model moves when text appears (negative = left)
+// - scenePosition.y: How far up/down the model moves when text appears (negative = down)
+// - finalModelScale: How small the model becomes when text appears (0.6 = 60% size)
 // - scrollAnimation.scrollEnd: How long the scroll animation lasts (e.g., "+=700%")
 // - scrollAnimation.cameraDuration: Speed of camera movement
 // - scrollAnimation.cameraEasing: Animation curve (e.g., "power2.out", "elastic.out")
@@ -42,7 +45,7 @@ const CAMERA_CONFIG = {
     initialPosition: { x: -1.95, y: 0.00, z: -0.1 },
     
     // Top-down view position (when scrolling)
-    topDownPosition: { x: 6, y: 3.73, z: 0.01 },
+    topDownPosition: { x: 0, y: 3.73, z: 0.01 },
     
     // Mouse influence on model rotation
     mouseInfluence: {
@@ -50,6 +53,15 @@ const CAMERA_CONFIG = {
       y: 0.1,   // Vertical mouse movement influence
       smoothing: 0.1  // How smooth the rotation follows mouse (0-1, lower = smoother)
     },
+    
+    // Scene position when text appears (Phase 3)
+    scenePosition: {
+      x: 1.3,  // Move scene left (negative = left, positive = right)
+      y: -1.5   // Move scene down (negative = down, positive = up)
+    },
+    
+    // Final model scale when text appears (Phase 3)
+    finalModelScale: 0.5,  // How small the model becomes (0.6 = 60% of original size)
     
     // Scroll animation settings
     scrollAnimation: {
@@ -86,6 +98,15 @@ const CAMERA_CONFIG = {
       y: 0.1,   // Vertical mouse movement influence
       smoothing: 0.1  // How smooth the rotation follows mouse (0-1, lower = smoother)
     },
+    
+    // Scene position when text appears (Phase 3)
+    scenePosition: {
+      x: -0.6,  // Move scene left (negative = left, positive = right)
+      y: -0.3   // Move scene down (negative = down, positive = up)
+    },
+    
+    // Final model scale when text appears (Phase 3)
+    finalModelScale: 0.6,  // How small the model becomes (0.6 = 60% of original size)
     
     // Scroll animation settings
     scrollAnimation: {
@@ -264,8 +285,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         if (sceneRef.current) {
              // Move Scene Left
             tl.to(sceneRef.current.position, {
-                x: -0.6,
-                y: -0.3,
+                x: config.scenePosition.x,
+                y: config.scenePosition.y,
                 duration: 0.8,
                 ease: "power2.inOut",
             }, "+=0.2")
@@ -273,9 +294,9 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
 
         if (modelRef.current) {
             tl.to(modelRef.current.scale, {
-                x: 0.6,
-                y: 0.6,
-                z: 0.6,
+                x: config.finalModelScale,
+                y: config.finalModelScale,
+                z: config.finalModelScale,
                 duration: 0.8,
                 ease: "power2.inOut"
             }, "<")
@@ -313,7 +334,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
     }, scrollContainer)
 
     return () => ctx.revert()
-  }, [camera, scrollContainer])
+  }, [camera, scrollContainer, config, isMobile])
 
   useFrame((state) => {
     if (sceneRef.current) {
