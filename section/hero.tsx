@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Suspense, useEffect, useRef } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { Environment, Center } from '@react-three/drei'
 import { LivingFluidBackground } from '@/components/living-fluid-background'
@@ -14,6 +14,100 @@ import * as THREE from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// ========================================
+// 3D MODEL MOVEMENT CONFIGURATION
+// ========================================
+// Adjust these values to control camera and model behavior for mobile and desktop separately
+//
+// Available Settings:
+// - modelScale: Size of the 3D model (1 = normal, 0.5 = half size, 2 = double size)
+// - initialPosition: Starting camera position (x = left/right, y = up/down, z = forward/back)
+// - topDownPosition: Camera position when scrolling (creates the top-down view effect)
+// - mouseInfluence.x: Horizontal mouse movement effect (higher = more rotation)
+// - mouseInfluence.y: Vertical mouse movement effect (higher = more rotation)
+// - mouseInfluence.smoothing: How smooth the rotation (0.1 = smooth, 1 = instant)
+// - scrollAnimation.scrollEnd: How long the scroll animation lasts (e.g., "+=700%")
+// - scrollAnimation.cameraDuration: Speed of camera movement
+// - scrollAnimation.cameraEasing: Animation curve (e.g., "power2.out", "elastic.out")
+// - scrollAnimation.backgroundDuration: Speed of background color change
+// - scrollAnimation.fadeOutDuration: Speed of intro text/clock fade out
+// - scrollAnimation.textFadeInDuration: Speed of "About Me" text fade in
+// ========================================
+const CAMERA_CONFIG = {
+  mobile: {
+    // Model scale (size of the 3D model)
+    modelScale: 1,
+    
+    // Initial camera position for mobile
+    initialPosition: { x: -1.95, y: 0.00, z: -0.1 },
+    
+    // Top-down view position (when scrolling)
+    topDownPosition: { x: 6, y: 3.73, z: 0.01 },
+    
+    // Mouse influence on model rotation
+    mouseInfluence: {
+      x: 0.02,  // Horizontal mouse movement influence
+      y: 0.1,   // Vertical mouse movement influence
+      smoothing: 0.1  // How smooth the rotation follows mouse (0-1, lower = smoother)
+    },
+    
+    // Scroll animation settings
+    scrollAnimation: {
+      scrollEnd: "+=700%",  // How long the scroll animation lasts
+      cameraDuration: 1,    // Duration of camera movement
+      cameraEasing: "power2.out",
+      
+      // Background transition
+      backgroundDuration: 0.5,
+      backgroundEasing: "power2.out",
+      
+      // Element fade timings
+      fadeOutDuration: 0.8,
+      fadeOutEasing: "power2.out",
+      
+      // Text fade in
+      textFadeInDuration: 0.8,
+      textFadeInEasing: "power2.inOut"
+    }
+  },
+  desktop: {
+    // Model scale (size of the 3D model)
+    modelScale: 1,
+    
+    // Initial camera position for desktop
+    initialPosition: { x: -1.95, y: 0.00, z: -0.1 },
+    
+    // Top-down view position (when scrolling)
+    topDownPosition: { x: 0, y: 3.73, z: 0.01 },
+    
+    // Mouse influence on model rotation
+    mouseInfluence: {
+      x: 0.02,  // Horizontal mouse movement influence
+      y: 0.1,   // Vertical mouse movement influence
+      smoothing: 0.1  // How smooth the rotation follows mouse (0-1, lower = smoother)
+    },
+    
+    // Scroll animation settings
+    scrollAnimation: {
+      scrollEnd: "+=700%",  // How long the scroll animation lasts
+      cameraDuration: 1,    // Duration of camera movement
+      cameraEasing: "power2.out",
+      
+      // Background transition
+      backgroundDuration: 0.5,
+      backgroundEasing: "power2.out",
+      
+      // Element fade timings
+      fadeOutDuration: 0.8,
+      fadeOutEasing: "power2.out",
+      
+      // Text fade in
+      textFadeInDuration: 0.8,
+      textFadeInEasing: "power2.inOut"
+    }
+  }
+}
+
 const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBottomRef, introWordsRef, worldClockRef }: { 
     scrollContainer: React.RefObject<HTMLDivElement | null>, 
     textRef: React.RefObject<HTMLDivElement | null>, 
@@ -26,12 +120,30 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
   const { camera } = useThree()
   const modelRef = useRef<THREE.Group>(null)
   const sceneRef = useRef<THREE.Group>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Get current config based on screen size
+  const config = isMobile ? CAMERA_CONFIG.mobile : CAMERA_CONFIG.desktop
 
   useEffect(() => {
     if (!scrollContainer.current) return
 
-    // Set initial position
-    camera.position.set(-1.95, 0.00, -0.1)
+    // Set initial position using config
+    camera.position.set(
+      config.initialPosition.x,
+      config.initialPosition.y,
+      config.initialPosition.z
+    )
     camera.lookAt(0, 0, 0)
 
     let ctx = gsap.context(() => {
@@ -39,20 +151,20 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             scrollTrigger: {
                 trigger: scrollContainer.current,
                 start: "top top",
-                end: "+=700%", // Extended for third animation phase
+                end: config.scrollAnimation.scrollEnd,
                 scrub: 1,
                 pin: true,
                 // markers: true,
             }
         })
 
-        // Phase 1: Animate Camera to top-down view
+        // Phase 1: Animate Camera to top-down view using config
         tl.to(camera.position, {
-            x: 0,
-            y: 3.73,
-            z: 0.01,
-            duration: 1,
-            ease: "power2.out",
+            x: config.topDownPosition.x,
+            y: config.topDownPosition.y,
+            z: config.topDownPosition.z,
+            duration: config.scrollAnimation.cameraDuration,
+            ease: config.scrollAnimation.cameraEasing,
             onUpdate: () => {
                 camera.lookAt(0, 0, 0)
             }
@@ -62,8 +174,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         if (scrollContainer.current) {
             tl.to(scrollContainer.current, {
                 backgroundColor: '#ffffff',
-                duration: 0.5,
-                ease: "power2.out"
+                duration: config.scrollAnimation.backgroundDuration,
+                ease: config.scrollAnimation.backgroundEasing
             }, 0)
         }
 
@@ -71,8 +183,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         if (fluidBgRef.current) {
             tl.to(fluidBgRef.current, {
                 opacity: 0,
-                duration: 0.5,
-                ease: "power2.out"
+                duration: config.scrollAnimation.backgroundDuration,
+                ease: config.scrollAnimation.backgroundEasing
             }, 0)
         }
 
@@ -81,8 +193,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             tl.to(introWordsRef.current, {
                 opacity: 0,
                 y: -50,
-                duration: 0.8,
-                ease: "power2.out"
+                duration: config.scrollAnimation.fadeOutDuration,
+                ease: config.scrollAnimation.fadeOutEasing
             }, 0)
         }
 
@@ -91,8 +203,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             tl.to(worldClockRef.current, {
                 opacity: 0,
                 y: -50,
-                duration: 0.8,
-                ease: "power2.out"
+                duration: config.scrollAnimation.fadeOutDuration,
+                ease: config.scrollAnimation.fadeOutEasing
             }, 0)
         }
 
@@ -110,7 +222,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         // We can do this safely because refs adhere to the same component lifecycle here
         if (modelRef.current) {
             modelRef.current.rotation.set(0, 0, 0)
-            modelRef.current.scale.set(1, 1, 1)
+            modelRef.current.scale.set(config.modelScale, config.modelScale, config.modelScale)
             
             tl.to(modelRef.current.rotation, {
                 x: 0, 
@@ -136,6 +248,15 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
                     ease: "power2.inOut"
                 }, "<")
             }
+        }
+
+        // Animate Top Navigation OUT (Contact button) - Phase 1
+        if (navTopRef.current) {
+            tl.to(navTopRef.current, {
+                opacity: 0,
+                duration: config.scrollAnimation.fadeOutDuration,
+                ease: config.scrollAnimation.fadeOutEasing
+            }, 0)
         }
         
         // Phase 3: Move Scene Left (Reliable)
@@ -168,8 +289,8 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
             }, {
                 opacity: 1,
                 x: 0,
-                duration: 0.8,
-                ease: "power2.inOut"
+                duration: config.scrollAnimation.textFadeInDuration,
+                ease: config.scrollAnimation.textFadeInEasing
             }, "<")
         }
 
@@ -199,12 +320,12 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         // Only allow mouse interaction if we are roughly in the hero section view
         // 1.5 viewport height buffer to ensure it feels responsive during the initial scroll
         if (window.scrollY < window.innerHeight * 1.5) {
-            // Simple subtle mouse influence
-            const targetY = state.mouse.x * 0.02
-            const targetX = -state.mouse.y * 0.1   
+            // Mouse influence using config values
+            const targetY = state.mouse.x * config.mouseInfluence.x
+            const targetX = -state.mouse.y * config.mouseInfluence.y
     
-            sceneRef.current.rotation.y += (targetY - sceneRef.current.rotation.y) * 0.1
-            sceneRef.current.rotation.x += (targetX - sceneRef.current.rotation.x) * 0.1
+            sceneRef.current.rotation.y += (targetY - sceneRef.current.rotation.y) * config.mouseInfluence.smoothing
+            sceneRef.current.rotation.x += (targetX - sceneRef.current.rotation.x) * config.mouseInfluence.smoothing
         }
     }
   })
@@ -216,7 +337,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
         <group ref={sceneRef}>
             <Center>
                 <group ref={modelRef}>
-                    <XelltextModel scale={1} />
+                    <XelltextModel scale={config.modelScale} />
                 </group>
             </Center>
         </group>
