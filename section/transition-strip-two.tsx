@@ -11,7 +11,7 @@ const TransitionStripTwo = () => {
     offset: ["start end", "end start"]
   })
 
-  // Vertical Parallax Speeds
+  // Vertical Parallax Speeds - Reduced movement on mobile
   const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"])
   const y2 = useTransform(scrollYProgress, [0, 1], ["-50%", "0%"])
   const y3 = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"])
@@ -19,9 +19,9 @@ const TransitionStripTwo = () => {
 
   const Column = ({ title, y, opacity = "opacity-100" }: { title: string, y: any, opacity?: string }) => (
     <div className="relative h-full overflow-hidden flex flex-col items-center justify-start border-r border-zinc-900 last:border-r-0">
-        <motion.div style={{ y }} className={`flex flex-col gap-8 py-8 ${opacity}`}>
+        <motion.div style={{ y }} className={`flex flex-col gap-4 md:gap-8 py-4 md:py-8 ${opacity}`}>
             {Array(20).fill(title).map((text, i) => (
-                <span key={i} className="text-4xl md:text-7xl font-black uppercase tracking-tighter text-zinc-900 select-none writing-vertical-rl">
+                <span key={i} className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-900 select-none writing-vertical-rl">
                     {text}
                 </span>
             ))}
@@ -51,7 +51,7 @@ const TransitionStripTwo = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 h-full w-full">
              <ColumnStacked words={["DEPLOY", "SHIP", "PUSH"]} y={y1} />
              <ColumnStacked words={["SCALE", "GROWTH", "UP"]} y={y2} className="hidden md:flex bg-zinc-900/20" />
-             <ColumnStacked words={["SECURE", "FAST", "SAFE"]} y={y3} />
+             <ColumnStacked words={["SECURE", "FAST", "SAFE"]} y={y3} className="hidden md:flex" />
              <ColumnStacked words={["GLOBAL", "REACH", "NOW"]} y={y4} className="bg-zinc-900/10" />
         </div>
 
