@@ -432,13 +432,13 @@ function CarouselCard({ project, index, angle, radius, cardWidth, isActive, isDr
             </div>
           </div>
 
-          {/* Active Border with glow */}
-          {isActive && (
-            <>
-              <div className={`absolute inset-0 border-2 ${project.borderColor} pointer-events-none`} />
+          {/* Border with glow - Always visible */}
+          <>
+            <div className={`absolute inset-0 border-2 ${project.borderColor} pointer-events-none`} />
+            {isActive && (
               <div className={`absolute inset-0 ${project.borderColor} opacity-20 blur-xl pointer-events-none`} />
-            </>
-          )}
+            )}
+          </>
         </div>
       </motion.div>
     </motion.div>
