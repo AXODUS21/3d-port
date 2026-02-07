@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react'
 import TransitionLink from '@/components/transition-link'
 import { useLenis } from '@/components/smooth-scroll'
+import LaptopDisplay from '@/components/laptop-display'
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
@@ -33,6 +34,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Creating a performant particle system that could handle millions of particles while maintaining 60fps across different devices.",
       solution: "Implemented instanced rendering, compute shaders for physics calculations, and a custom culling system that only renders visible particles.",
       results: ["10M+ particles at 60fps", "50% reduction in memory usage", "Cross-platform compatibility"],
+      embedUrl: "https://threejs.org/examples/webgl_instancing_dynamic",
     },
     '2': {
       title: "Kill The Pitch",
@@ -44,6 +46,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Building a real-time financial dashboard that could handle high-frequency updates while maintaining data accuracy.",
       solution: "Developed a custom WebSocket infrastructure with optimistic updates and conflict resolution, backed by Solana's high-throughput blockchain.",
       results: ["$50M+ in managed assets", "99.99% uptime", "Sub-100ms update latency"],
+      embedUrl: "https://app.killthepitch.com",
     },
     '3': {
       title: "SBTLC",
@@ -55,6 +58,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Creating a responsive, multi-tasking environment within the constraints of a web browser.",
       solution: "Built a custom virtual machine using WebAssembly, implemented cooperative multitasking, and created a virtual file system with IndexedDB persistence.",
       results: ["100K+ active users", "50+ integrated apps", "Featured on HackerNews"],
+      embedUrl: "https://smartbrainlearning.org/",
     },
     '4': {
       title: "Spooftify",
@@ -66,6 +70,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Achieving console-quality performance and audio in a browser game without using established game engines.",
       solution: "Implemented a custom rendering pipeline with object pooling, developed a procedural generation system with seed-based reproducibility, and created a reactive audio engine using Web Audio API.",
       results: ["500K+ plays", "4.8/5 rating", "Featured on gaming blogs"],
+      embedUrl: "https://spootify-khaki.vercel.app/",
     },
     '5': {
       title: "Email Superstars",
@@ -77,6 +82,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Building a real-time financial dashboard that could handle high-frequency updates while maintaining data accuracy.",
       solution: "Developed a custom WebSocket infrastructure with optimistic updates and conflict resolution, backed by Solana's high-throughput blockchain.",
       results: ["$50M+ in managed assets", "99.99% uptime", "Sub-100ms update latency"],
+      embedUrl: "https://emailsuperstars.com/",
+      
     },
   }
 
@@ -122,13 +129,11 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       </section>
 
       {/* Project Image */}
+      {/* Project Laptop Display */}
       <section className="px-6 mb-20">
         <div className="max-w-7xl mx-auto">
-          <div className="aspect-video bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
-            <div className="w-full h-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-zinc-800 to-zinc-950 flex items-center justify-center">
-              <span className="text-zinc-700 font-mono text-2xl">PROJECT_PREVIEW.jpg</span>
-            </div>
-          </div>
+             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-zinc-800/30 to-zinc-950 -z-10" />
+             <LaptopDisplay url={project.embedUrl} />
         </div>
       </section>
 
