@@ -32,18 +32,32 @@ export default function FeaturedProjects() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Helper to find the closest rotation for a target index to maintain infinite scroll illusion
+  const getClosestRotation = (targetIndex: number, currentRotation: number) => {
+    const targetBase = -targetIndex * ROTATION_UNIT;
+    // Find how many full rotations we are away from the base
+    const k = Math.round((currentRotation - targetBase) / 360);
+    return targetBase + k * 360;
+  };
+
   const rotateCarousel = (direction: "next" | "prev") => {
-    const newIndex = direction === "next" 
-      ? (activeIndex + 1) % featuredProjects.length
-      : (activeIndex - 1 + featuredProjects.length) % featuredProjects.length;
+    const currentRotation = rotation.get();
+    // Snap to grid
+    const snap = Math.round(currentRotation / ROTATION_UNIT) * ROTATION_UNIT;
     
-    setActiveIndex(newIndex);
-    const targetRotation = -newIndex * ROTATION_UNIT;
+    const targetRotation = direction === "next" 
+      ? snap - ROTATION_UNIT
+      : snap + ROTATION_UNIT;
+    
     animate(rotation, targetRotation, {
       type: "spring",
       stiffness: 100,
       damping: 30
     });
+    
+    const rawIndex = Math.round(-targetRotation / ROTATION_UNIT);
+    const finalIndex = ((rawIndex % featuredProjects.length) + featuredProjects.length) % featuredProjects.length;
+    setActiveIndex(finalIndex);
   };
 
   const handleDragStart = () => {
@@ -51,22 +65,31 @@ export default function FeaturedProjects() {
     dragStartRotation.current = rotation.get();
   };
 
-  const handleDrag = () => {
+  const handleDrag = (_: any, info: any) => {
     isDragging.current = true;
+    const sensitivity = isMobile ? 0.3 : 0.15;
+    rotation.set(rotation.get() + info.delta.x * sensitivity);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (_: any, info: any) => {
     const currentRotation = rotation.get();
-    const normalizedRotation = ((currentRotation % 360) + 360) % 360;
-    const closestIndex = Math.round(-normalizedRotation / ROTATION_UNIT) % featuredProjects.length;
-    const finalIndex = (closestIndex + featuredProjects.length) % featuredProjects.length;
+    const velocity = info.velocity.x;
     
-    setActiveIndex(finalIndex);
-    animate(rotation, -finalIndex * ROTATION_UNIT, {
+    // Add inertia based on velocity
+    const predictedRotation = currentRotation + velocity * 0.2;
+    
+    // Snap to nearest unit, WITHOUT normalizing to 0-360 to allow infinite spin
+    const targetRotation = Math.round(predictedRotation / ROTATION_UNIT) * ROTATION_UNIT;
+    
+    animate(rotation, targetRotation, {
       type: "spring",
-      stiffness: 100,
-      damping: 30
+      stiffness: 50,
+      damping: 20
     });
+
+    const rawIndex = Math.round(-targetRotation / ROTATION_UNIT);
+    const finalIndex = ((rawIndex % featuredProjects.length) + featuredProjects.length) % featuredProjects.length;
+    setActiveIndex(finalIndex);
 
     // Reset drag state after a short delay
     setTimeout(() => {
@@ -214,7 +237,8 @@ export default function FeaturedProjects() {
           <motion.div
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
+            dragElastic={0}
+            dragMomentum={false}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
@@ -248,7 +272,7 @@ export default function FeaturedProjects() {
             whileHover={{ scale: 1.1, x: -4 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => rotateCarousel("prev")}
-            className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 border-2 border-white/20 bg-black/50 backdrop-blur-md hover:bg-white hover:border-white text-white hover:text-black flex items-center justify-center transition-all group shadow-lg shadow-black/50"
+            className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 border-2 border-white/20 bg-black/50 backdrop-blur-md hover:bg-white hover:border-white text-white hover:text-black hidden md:flex items-center justify-center transition-all group shadow-lg shadow-black/50"
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:-translate-x-1 transition-transform" />
           </motion.button>
@@ -256,7 +280,7 @@ export default function FeaturedProjects() {
             whileHover={{ scale: 1.1, x: 4 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => rotateCarousel("next")}
-            className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 border-2 border-white/20 bg-black/50 backdrop-blur-md hover:bg-white hover:border-white text-white hover:text-black flex items-center justify-center transition-all group shadow-lg shadow-black/50"
+            className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 border-2 border-white/20 bg-black/50 backdrop-blur-md hover:bg-white hover:border-white text-white hover:text-black hidden md:flex items-center justify-center transition-all group shadow-lg shadow-black/50"
           >
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
           </motion.button>
@@ -271,7 +295,10 @@ export default function FeaturedProjects() {
               whileTap={{ scale: 0.9 }}
               onClick={() => {
                 setActiveIndex(index);
-                animate(rotation, -index * ROTATION_UNIT, {
+                const currentRotation = rotation.get();
+                const targetRotation = getClosestRotation(index, currentRotation);
+                
+                animate(rotation, targetRotation, {
                   type: "spring",
                   stiffness: 100,
                   damping: 30
