@@ -67,7 +67,8 @@ export default function FeaturedProjects() {
 
   const handleDrag = (_: any, info: any) => {
     isDragging.current = true;
-    const sensitivity = isMobile ? 0.3 : 0.15;
+    // Reduced sensitivity to make it feel heavier and more precise
+    const sensitivity = isMobile ? 0.15 : 0.08;
     rotation.set(rotation.get() + info.delta.x * sensitivity);
   };
 
@@ -75,16 +76,20 @@ export default function FeaturedProjects() {
     const currentRotation = rotation.get();
     const velocity = info.velocity.x;
     
-    // Add inertia based on velocity
-    const predictedRotation = currentRotation + velocity * 0.2;
+    // Significantly reduced inertia to prevent skipping cards
+    // Capped velocity influence to prevent wild spinning
+    const maxVelocityImpact = ROTATION_UNIT * 1.5; // Don't let momentum carry it more than ~1.5 cards
+    const velocityImpact = Math.max(Math.min(velocity * 0.05, maxVelocityImpact), -maxVelocityImpact);
     
-    // Snap to nearest unit, WITHOUT normalizing to 0-360 to allow infinite spin
+    const predictedRotation = currentRotation + velocityImpact;
+    
+    // Snap to nearest unit
     const targetRotation = Math.round(predictedRotation / ROTATION_UNIT) * ROTATION_UNIT;
     
     animate(rotation, targetRotation, {
       type: "spring",
-      stiffness: 50,
-      damping: 20
+      stiffness: 80, // Increased stiffness for snappier stop
+      damping: 25   // Adjusted damping
     });
 
     const rawIndex = Math.round(-targetRotation / ROTATION_UNIT);
