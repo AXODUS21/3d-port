@@ -65,7 +65,7 @@ const CAMERA_CONFIG = {
     
     // Scroll animation settings
     scrollAnimation: {
-      scrollEnd: "+=700%",  // How long the scroll animation lasts
+      scrollEnd: "+=550%",  // How long the scroll animation lasts
       cameraDuration: 1,    // Duration of camera movement
       cameraEasing: "power2.out",
       
@@ -110,7 +110,7 @@ const CAMERA_CONFIG = {
     
     // Scroll animation settings
     scrollAnimation: {
-      scrollEnd: "+=700%",  // How long the scroll animation lasts
+      scrollEnd: "+=550%",  // How long the scroll animation lasts
       cameraDuration: 1,    // Duration of camera movement
       cameraEasing: "power2.out",
       
@@ -173,7 +173,7 @@ const SceneContent = ({ scrollContainer, textRef, fluidBgRef, navTopRef, navBott
                 trigger: scrollContainer.current,
                 start: "top top",
                 end: config.scrollAnimation.scrollEnd,
-                scrub: 1,
+                scrub: 0.5,
                 pin: true,
                 // markers: true,
             }
