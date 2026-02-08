@@ -45,7 +45,7 @@ const CAMERA_CONFIG = {
     initialPosition: { x: -1.95, y: 0.00, z: -0.1 },
     
     // Top-down view position (when scrolling)
-    topDownPosition: { x: 0, y: 3.73, z: 0.01 },
+    topDownPosition: { x: 0, y: 7, z: 0.01 },
     
     // Mouse influence on model rotation
     mouseInfluence: {
@@ -57,7 +57,7 @@ const CAMERA_CONFIG = {
     // Scene position when text appears (Phase 3)
     scenePosition: {
       x: 1.3,  // Move scene left (negative = left, positive = right)
-      y: -1.5   // Move scene down (negative = down, positive = up)
+      y: 2   // Move scene down (negative = down, positive = up)
     },
     
     // Final model scale when text appears (Phase 3)
