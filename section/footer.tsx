@@ -15,7 +15,7 @@ const Footer = () => {
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               viewport={{ once: true }}
-              className="text-[5.75rem] md:text-[8.625rem] lg:text-[11.5rem] font-black tracking-tighter leading-[0.85] text-white uppercase text-right"
+              className="text-[9.5vw] lg:text-[11.5rem] font-black tracking-tighter leading-[0.85] text-white uppercase text-right"
             >
               AXELLEROS
             </motion.h2>
@@ -24,20 +24,20 @@ const Footer = () => {
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
               viewport={{ once: true }}
-              className="text-[8rem] md:text-[12rem] lg:text-[16rem] font-black tracking-tighter leading-[0.85] text-white uppercase text-right"
+              className="text-[13vw] lg:text-[16rem] font-black tracking-tighter leading-[0.85] text-white uppercase text-right"
             >
               XELLTEC
             </motion.h2>
           </div>
           
           {/* Large Shared H */}
-          <div className="relative -ml-4">
+          <div className="relative -ml-[1.5vw] lg:-ml-4">
             <motion.h2 
               initial={{ x: 100, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
               viewport={{ once: true }}
-              className="text-[16rem] md:text-[24rem] lg:text-[32rem] font-black tracking-tighter leading-[0.85] text-white uppercase -translate-y-4"
+              className="text-[26vw] lg:text-[32rem] font-black tracking-tighter leading-[0.85] text-white uppercase -translate-y-[1vw] lg:-translate-y-4 max-sm:translate-x-1"
             >
               H
             </motion.h2>
