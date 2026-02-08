@@ -80,18 +80,52 @@ const Testimonials = () => {
   const [playingVideo, setPlayingVideo] = useState<number | null>(null)
   const [unmutedVideos, setUnmutedVideos] = useState<Set<number>>(new Set())
   const [modalVideo, setModalVideo] = useState<Testimonial | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [transitionFromIndex, setTransitionFromIndex] = useState<number | null>(null)
+  const [transitionStartProgress, setTransitionStartProgress] = useState(0)
+  const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward')
   
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonialsData.length)
-    setPlayingVideo(null) // Stop playing when switching
+    setIsTransitioning(true)
+    setTransitionFromIndex(currentIndex)
+    setTransitionStartProgress(progress) // Capture current progress
+    setTransitionDirection('forward')
+    
+    // Fill the current bar to 100% first
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonialsData.length)
+      setPlayingVideo(null)
+      
+      // Reset transition state after the new bar starts
+      setTimeout(() => {
+        setIsTransitioning(false)
+        setTransitionFromIndex(null)
+        setTransitionStartProgress(0)
+      }, 300)
+    }, 300)
   }
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonialsData.length) % testimonialsData.length)
-    setPlayingVideo(null)
+    setIsTransitioning(true)
+    setTransitionFromIndex(currentIndex)
+    setTransitionStartProgress(progress) // Capture current progress
+    setTransitionDirection('backward')
+    
+    // Empty the current bar to 0% first (reverse animation)
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev - 1 + testimonialsData.length) % testimonialsData.length)
+      setPlayingVideo(null)
+      
+      // Reset transition state after the new bar starts
+      setTimeout(() => {
+        setIsTransitioning(false)
+        setTransitionFromIndex(null)
+        setTransitionStartProgress(0)
+      }, 300)
+    }, 300)
   }
 
   const togglePlay = (id: number, e: React.MouseEvent) => {
@@ -351,52 +385,104 @@ const Testimonials = () => {
                                        </div>
                                    </div>
                                )}
-
-                               {/* INFO BAR - ALWAYS VISIBLE */}
-                               <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-linear-to-t from-black to-transparent z-20 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center border border-white/10 font-bold text-zinc-500">
-                                            {testimonialsData[currentIndex].author.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <h3 className="text-white font-mono uppercase tracking-widest text-sm md:text-base font-bold">
-                                                {testimonialsData[currentIndex].author}
-                                            </h3>
-                                            <p className="text-zinc-400 font-mono text-xs md:text-sm">
-                                                {testimonialsData[currentIndex].role} @ {testimonialsData[currentIndex].company}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="hidden md:block">
-                                        <div className="px-3 py-1 bg-white/10 border border-white/10 rounded text-[10px] font-mono text-white/70 uppercase tracking-widest">
-                                            {testimonialsData[currentIndex].type === 'video' ? 'Video Review' : 'Verified Quote'}
-                                        </div>
-                                    </div>
-                               </div>
                           </motion.div>
                       </AnimatePresence>
+                      
+                      {/* INFO BAR - ALWAYS VISIBLE - OUTSIDE MAIN ANIMATION */}
+                      <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-linear-to-t from-black to-transparent z-20 flex items-center justify-between pointer-events-none">
+                           <div className="flex items-center gap-4">
+                               <AnimatePresence mode="wait">
+                                   <motion.div
+                                       key={`avatar-${currentIndex}`}
+                                       initial={{ opacity: 0, scale: 0.8 }}
+                                       animate={{ opacity: 1, scale: 1 }}
+                                       exit={{ opacity: 0, scale: 0.8 }}
+                                       transition={{ duration: 0.3, ease: "easeInOut" }}
+                                       className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center border border-white/10 font-bold text-zinc-500"
+                                   >
+                                       {testimonialsData[currentIndex].author.charAt(0)}
+                                   </motion.div>
+                               </AnimatePresence>
+                               <div className="overflow-hidden">
+                                   <AnimatePresence mode="wait">
+                                       <motion.div
+                                           key={`info-${currentIndex}`}
+                                           initial={{ opacity: 0, x: -20 }}
+                                           animate={{ opacity: 1, x: 0 }}
+                                           exit={{ opacity: 0, x: 20 }}
+                                           transition={{ duration: 0.3, ease: "easeInOut" }}
+                                       >
+                                           <h3 className="text-white font-mono uppercase tracking-widest text-sm md:text-base font-bold">
+                                               {testimonialsData[currentIndex].author}
+                                           </h3>
+                                           <p className="text-zinc-400 font-mono text-xs md:text-sm">
+                                               {testimonialsData[currentIndex].role} @ {testimonialsData[currentIndex].company}
+                                           </p>
+                                       </motion.div>
+                                   </AnimatePresence>
+                               </div>
+                           </div>
+                           
+                           <div className="hidden md:block overflow-hidden">
+                               <AnimatePresence mode="wait">
+                                   <motion.div
+                                       key={`badge-${currentIndex}`}
+                                       initial={{ opacity: 0, x: 20 }}
+                                       animate={{ opacity: 1, x: 0 }}
+                                       exit={{ opacity: 0, x: -20 }}
+                                       transition={{ duration: 0.3, ease: "easeInOut" }}
+                                       className="px-3 py-1 bg-white/10 border border-white/10 rounded text-[10px] font-mono text-white/70 uppercase tracking-widest"
+                                   >
+                                       {testimonialsData[currentIndex].type === 'video' ? 'Video Review' : 'Verified Quote'}
+                                   </motion.div>
+                               </AnimatePresence>
+                           </div>
+                      </div>
                  </div>
                  
                  {/* Progress Line */}
                  <div className="absolute -bottom-10 left-0 w-full flex items-center gap-2">
-                     {testimonialsData.map((_, idx) => (
-                         <button 
-                             key={idx}
-                             onClick={() => {
+                     {testimonialsData.map((_, idx) => {
+                         const isCurrent = idx === currentIndex
+                         const isTransitioningFrom = isTransitioning && idx === transitionFromIndex
+                         
+                         return (
+                             <button 
+                                 key={idx}
+                                 onClick={() => {
                                  setPlayingVideo(null)
-                                 setCurrentIndex(idx)
-                             }}
-                             className={`h-1 flex-1 rounded-full transition-all duration-300 relative overflow-hidden bg-zinc-800 hover:bg-zinc-700`}
-                         >
-                            {idx === currentIndex && (
-                                <div 
-                                    className="absolute inset-0 bg-white h-full transition-all duration-100 ease-linear"
-                                    style={{ width: `${progress}%` }}
-                                />
-                            )}
-                         </button>
-                     ))}
+                                     setCurrentIndex(idx)
+                                 }}
+                                 className={`h-1 flex-1 rounded-full transition-all duration-300 relative overflow-hidden bg-zinc-800 hover:bg-zinc-700`}
+                             >
+                                {/* Show transitioning bar filling to 100% or emptying to 0% */}
+                                {isTransitioningFrom && (
+                                    <motion.div 
+                                        className="absolute inset-0 bg-white h-full"
+                                        initial={{ width: `${transitionStartProgress}%` }}
+                                        animate={{ width: transitionDirection === 'forward' ? '100%' : '0%' }}
+                                        transition={{ duration: 0.3, ease: transitionDirection === 'forward' ? "easeOut" : "easeIn" }}
+                                    />
+                                )}
+                                
+                                {/* Show current bar with normal progress */}
+                                {isCurrent && !isTransitioning && (
+                                    <div 
+                                        className="absolute inset-0 bg-white h-full transition-all duration-100 ease-linear"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                )}
+                                
+                                {/* Show new bar starting from 0% during transition */}
+                                {isCurrent && isTransitioning && (
+                                    <div 
+                                        className="absolute inset-0 bg-white h-full transition-all duration-300 ease-in"
+                                        style={{ width: '0%' }}
+                                    />
+                                )}
+                             </button>
+                         )
+                     })}
                  </div>
             </div>
 
