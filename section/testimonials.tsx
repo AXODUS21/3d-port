@@ -273,7 +273,7 @@ const Testimonials = () => {
 
                <div className="hidden lg:block">
                   <p className="text-zinc-400 text-sm md:text-base max-w-sm leading-relaxed mb-8">
-                     Trusted by forward-thinking companies. We deliver high-performance digital solutions that drive real business growth.
+                     Trusted by forward-thinking companies and individuals. I deliver high-performance digital solutions that drive real business growth.
                   </p>
                   
                   {/* Status Indicator */}
