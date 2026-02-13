@@ -13,6 +13,7 @@ interface Testimonial {
   author: string
   role: string
   company: string
+  image?: string
 }
 
 const testimonialsData: Testimonial[] = [
@@ -22,15 +23,17 @@ const testimonialsData: Testimonial[] = [
     videoUrl: '/testimonials/Oscar Testimonial.mp4',
     author: "Oscar",
     role: "Founder",
-    company: "ScaleSet"
+    company: "ScaleSet",
+    image: "/testimonials/pfp/oscar.jpg"
   },
   {
     id: 2,
     type: 'text',
-    text: "Absolutely mind-blowing technical execution. The transition from the loading state to the hero section is the smoothest I've ever seen.",
-    author: "Marcus Chen",
-    role: "CTO",
-    company: "Nebula Stream"
+    text: "A rare talent who combines strategic thinking with flawless execution. Highly recommended.",
+    author: "Ilyne Root",
+    role: "Founder",
+    company: "Smart Brain",
+    image: "/testimonials/pfp/SB.jpg"
   },
   {
     id: 3,
@@ -38,40 +41,26 @@ const testimonialsData: Testimonial[] = [
     videoUrl: '/testimonials/sam video testimonial.mp4',
     author: "Sam",
     role: "Founder",
-    company: "Prism Digital"
+    company: "Prism Digital",
+    image: "/testimonials/pfp/sam.jpg"
   },
   {
     id: 4,
     type: 'text',
-    text: "The design system built for us was scalable, beautiful, and easy to maintain. A perfect blend of engineering and artistic vision.",
-    author: "David Kim",
-    role: "VP of Engineering",
-    company: "Flux OS"
+    text: "AG Dental Clinic had clear requirements and a strict deadline, which he handled with remarkable efficiency. He took the time to understand our vision and transformed it into a beautiful website that truly reflects our practice. The design is sleek, contemporary, and fully responsive, ensuring accessibility for all our patients.",
+    author: "Ged Soldevilla",
+    role: "Owner",
+    company: "AG Dental Clinic",
+    image: "/testimonials/pfp/AG.jpg"
   },
   {
     id: 5,
-    type: 'video',
-    videoUrl: '/testimonials/video3.mp4',
-    thumbnail: '/testimonials/thumb3.jpg',
-    author: "James Thorne",
-    role: "Co-Founder",
-    company: "Aether Finance"
-  },
-  {
-    id: 6,
     type: 'text',
-    text: "Working with this team transformed our digital presence. The attention to detail and creative solutions exceeded all expectations.",
-    author: "Lisa Wang",
-    role: "Marketing Lead",
-    company: "Quantum Dynamics"
-  },
-  {
-    id: 7,
-    type: 'text',
-    text: "Revolutionary approach to web development. They delivered a platform that handles millions of users without breaking a sweat.",
-    author: "Alex Thompson",
+    text: "Our project had specific requirements and a tight deadline, and He managed everything with great efficiency. He took the time to understand our vision and translated it into a stunning website that perfectly represents our brand. The design is modern and responsive.",
+    author: "Christian Dimac",
     role: "Tech Lead",
-    company: "CloudScale"
+    company: "CloudScale",
+    image: "/testimonials/pfp/christian.jpg"
   }
 ]
 
@@ -267,7 +256,7 @@ const Testimonials = () => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Column: Navigation & Info */}
@@ -391,18 +380,28 @@ const Testimonials = () => {
                       {/* INFO BAR - ALWAYS VISIBLE - OUTSIDE MAIN ANIMATION */}
                       <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-linear-to-t from-black to-transparent z-20 flex items-center justify-between pointer-events-none">
                            <div className="flex items-center gap-4">
-                               <AnimatePresence mode="wait">
-                                   <motion.div
-                                       key={`avatar-${currentIndex}`}
-                                       initial={{ opacity: 0, scale: 0.8 }}
-                                       animate={{ opacity: 1, scale: 1 }}
-                                       exit={{ opacity: 0, scale: 0.8 }}
-                                       transition={{ duration: 0.3, ease: "easeInOut" }}
-                                       className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center border border-white/10 font-bold text-zinc-500"
-                                   >
-                                       {testimonialsData[currentIndex].author.charAt(0)}
-                                   </motion.div>
-                               </AnimatePresence>
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={`avatar-${currentIndex}`}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                        className="w-12 h-12 rounded-full border border-white/10 overflow-hidden"
+                                    >
+                                        {testimonialsData[currentIndex].image ? (
+                                            <img 
+                                                src={testimonialsData[currentIndex].image} 
+                                                alt={testimonialsData[currentIndex].author}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
+                                                {testimonialsData[currentIndex].author.charAt(0)}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                </AnimatePresence>
                                <div className="overflow-hidden">
                                    <AnimatePresence mode="wait">
                                        <motion.div
