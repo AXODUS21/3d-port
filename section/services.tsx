@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import TransitionLink from '@/components/transition-link'
+import Image from 'next/image'
 
 const services = [
   {
@@ -102,12 +103,15 @@ function ServiceCard({ service, index, isActive, onHover }: ServiceCardProps) {
         <motion.div
           animate={{ scale: isActive ? 1.05 : 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full h-full"
+          className="w-full h-full relative"
         >
-          <img 
+          <Image 
             src={service.image}
             alt={service.menuTitle}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+            priority={index === 0}
           />
         </motion.div>
         {/* Overlay */}

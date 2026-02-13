@@ -7,11 +7,13 @@ import TransitionOverlay from "@/components/transition-overlay";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap', // Prevent layout shift during font loading
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap', // Prevent layout shift during font loading
 });
 
 export const metadata: Metadata = {

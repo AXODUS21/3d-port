@@ -408,6 +408,12 @@ const Hero = (props: Props) => {
               <Canvas 
                 className="pointer-events-none z-0 relative h-[60vh] md:h-full" 
                 camera={{ position: [-2.23, 0.00, -0.14], fov: 45 }}
+                gl={{ 
+                  antialias: false, // Faster initial render
+                  powerPreference: 'high-performance',
+                }}
+                dpr={[1, 2]} // Limit device pixel ratio for better performance
+                performance={{ min: 0.5 }} // Auto-adjust quality based on performance
               >
                   <Suspense fallback={null}>
                       <SceneContent 

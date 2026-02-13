@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, Maximize2, X, Volume2, VolumeX, Quote, ArrowLeft, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react'
+import Image from 'next/image'
 
 interface Testimonial {
   id: number
@@ -387,13 +388,15 @@ const Testimonials = () => {
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.8 }}
                                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                                        className="w-12 h-12 rounded-full border border-white/10 overflow-hidden"
+                                        className="w-12 h-12 rounded-full border border-white/10 overflow-hidden relative"
                                     >
                                         {testimonialsData[currentIndex].image ? (
-                                            <img 
+                                            <Image 
                                                 src={testimonialsData[currentIndex].image} 
                                                 alt={testimonialsData[currentIndex].author}
-                                                className="w-full h-full object-cover"
+                                                fill
+                                                sizes="48px"
+                                                className="object-cover"
                                             />
                                         ) : (
                                             <div className="w-full h-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
