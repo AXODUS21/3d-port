@@ -1,6 +1,61 @@
+'use client'
+
 import { Linkedin, Instagram, Calendar } from 'lucide-react'
+import { useState, FormEvent } from 'react'
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setStatus('loading')
+    setErrorMessage('')
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
+      setStatus('success')
+      setFormData({ name: '', email: '', message: '' })
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (error) {
+      setStatus('error')
+      setErrorMessage(error instanceof Error ? error.message : 'Something went wrong')
+      
+      // Reset error message after 5 seconds
+      setTimeout(() => {
+        setStatus('idle')
+        setErrorMessage('')
+      }, 5000)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
+  }
+
   return (
     <section id="contact" className="min-h-screen py-32 px-8 flex flex-col items-center justify-center bg-zinc-950 text-white relative border-t border-zinc-900">
       
@@ -19,34 +74,59 @@ const Contact = () => {
             </div>
          </div>
 
-        <form className="flex flex-col gap-12">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="group relative">
                 <input 
-                  type="text" 
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   required
-                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700"
+                  disabled={status === 'loading'}
+                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700 disabled:opacity-50"
                   placeholder="NAME"
                 />
             </div>
             <div className="group relative">
                 <input 
-                  type="email" 
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
-                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700"
+                  disabled={status === 'loading'}
+                  className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700 disabled:opacity-50"
                   placeholder="EMAIL"
                 />
             </div>
           </div>
           
           <div className="group relative">
-            <textarea 
+            <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
                 rows={4}
                 required
-                className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700 resize-none"
+                disabled={status === 'loading'}
+                className="w-full bg-transparent border-b border-zinc-800 py-4 text-2xl md:text-3xl font-light text-white outline-none focus:border-white transition-colors duration-300 placeholder:text-zinc-700 resize-none disabled:opacity-50"
                 placeholder="MESSAGE"
             ></textarea>
           </div>
+
+          {/* Status Messages */}
+          {status === 'success' && (
+            <div className="px-6 py-4 bg-green-500/10 border border-green-500/20 rounded text-green-400 font-mono text-sm">
+              ✓ Message sent successfully! I'll get back to you soon.
+            </div>
+          )}
+          
+          {status === 'error' && (
+            <div className="px-6 py-4 bg-red-500/10 border border-red-500/20 rounded text-red-400 font-mono text-sm">
+              ✗ {errorMessage || 'Failed to send message. Please try again.'}
+            </div>
+          )}
           
           <div className="flex flex-col-reverse md:flex-row items-center justify-between mt-12 gap-8">
             <div className="flex gap-8">
@@ -64,8 +144,12 @@ const Contact = () => {
                 </a>
             </div>
 
-            <button className="px-12 py-4 bg-white text-black text-sm font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-all cursor-pointer w-full md:w-auto">
-                Send Transmission
+            <button 
+              type="submit"
+              disabled={status === 'loading'}
+              className="px-12 py-4 bg-white text-black text-sm font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-all cursor-pointer w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {status === 'loading' ? 'Sending...' : 'Send Transmission'}
             </button>
           </div>
         </form>
