@@ -34,7 +34,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       challenge: "Creating a performant particle system that could handle millions of particles while maintaining 60fps across different devices.",
       solution: "Implemented instanced rendering, compute shaders for physics calculations, and a custom culling system that only renders visible particles.",
       results: ["10M+ particles at 60fps", "50% reduction in memory usage", "Cross-platform compatibility"],
-      embedUrl: "",
+      embedUrl: "https://shipvelocity.com/",
     },
     '2': {
       title: "Kill The Pitch",
